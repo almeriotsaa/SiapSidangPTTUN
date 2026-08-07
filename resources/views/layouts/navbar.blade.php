@@ -1,74 +1,204 @@
-<nav class="navbar navbar-expand-lg bg-white shadow-sm fixed-top">
+<nav class="navbar navbar-expand-md siap-navbar sticky-top">
 
-<div class="container-fluid">
+    <div class="container-fluid px-4 px-xxl-5">
 
-<a class="navbar-brand fw-bold text-primary"
-href="/dashboard">
+        <!-- Logo -->
+        <a class="navbar-brand d-flex align-items-center" href="/">
 
-<i class="bi bi-building"></i>
+            <div class="logo-box">
+                <img src="{{ asset('assets/images/pttun logo.png') }}" alt="">
+            </div>
 
-SIAP SIDANG
+            <div class="ms-3">
 
-</a>
+                <div class="brand-title">
+                    SIAP SIDANG
+                </div>
 
-<div class="ms-auto d-flex align-items-center">
+                <div class="brand-sub-title">
+                    PT TUN Jakarta
+                </div>
 
-<span class="text-secondary me-4">
+            </div>
 
-<i class="bi bi-calendar-event"></i>
+        </a>
 
-{{ date('d F Y') }}
+        <button class="navbar-toggler"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarSIAP">
 
-</span>
+            <span class="navbar-toggler-icon"></span>
 
-<div class="dropdown">
+        </button>
 
-<a href="#"
+        <div class="collapse navbar-collapse" id="navbarSIAP">
 
-class="text-decoration-none dropdown-toggle"
+            <ul class="navbar-nav ms-auto align-items-lg-center">
 
-data-bs-toggle="dropdown">
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->is('dashboard*') ? 'active' : '' }}"
+                        href="/dashboard">
+                        Dashboard
+                    </a>
+                </li>
 
-<i class="bi bi-person-circle fs-5"></i>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->is('kelola*') ? 'active' : '' }}"
+                        href="/kelola-jadwal">
+                        Jadwal Sidang
+                    </a>
+                </li>
 
-{{ Auth::user()->name ?? 'Admin' }}
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->is('kehadiran*') ? 'active' : '' }}"
+                        href="/kehadiran">
+                        Kehadiran
+                    </a>
+                </li>
 
-</a>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->is('riwayat*') ? 'active' : '' }}"
+                        href="/riwayat">
+                        Riwayat
+                    </a>
+                </li>
 
-<ul class="dropdown-menu dropdown-menu-end">
+                <li class="nav-item ms-lg-2">
+                    <form method="POST" action="{{ route('logout') }}" class="d-inline">
+                        @csrf
+                        <button type="submit" class="btn-keanggotaan">
+                            <i class="bi bi-box-arrow-right me-2"></i>
+                            Log out
+                        </button>
+                    </form>
+                </li>
 
-<li>
+            </ul>
 
-<a class="dropdown-item"
+        </div>
 
-href="#">
-
-Profil
-
-</a>
-
-</li>
-
-<li><hr></li>
-
-<li>
-
-<a class="dropdown-item text-danger"
-
-href="#">
-
-Logout
-
-</a>
-
-</li>
-
-</ul>
-
-</div>
-
-</div>
-
-</div>
+    </div>
 
 </nav>
+
+<style>
+    :root {
+        --navy: #0F2C4C;
+        --gold: #C9A227;
+        --gold-light: #FFF8E8;
+        --text: #4B5563;
+    }
+
+    .siap-navbar {
+        background: #fff;
+        height: auto;
+        border-bottom: 1px solid #ececec;
+        box-shadow: 0 4px 18px rgba(15, 44, 76, .06);
+        z-index: 999;
+    }
+
+    .logo-box img{
+        width: 64px;
+        display: flex;
+    }
+
+    .brand-title {
+        /* font-family: 'Source Serif 4', serif; */
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--navy);
+        letter-spacing: .5px;
+    }
+
+    .brand-sub-title {
+        font-size: 16px;
+        color: var(--gold);
+        font-weight: 500;
+    }
+
+    .nav-link {
+        color: var(--text);
+        font-weight: 500;
+        padding: 10px 18px !important;
+        border-radius: 10px;
+        transition: .25s;
+    }
+
+    .nav-link:hover {
+        background: #F7F8FA;
+        color: var(--navy);
+    }
+
+    .nav-link.active {
+        background: var(--gold-light);
+        color: var(--gold) !important;
+        font-weight: 600;
+    }
+
+    .btn-keanggotaan {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 18px;
+        border-radius: 10px;
+        text-decoration: none;
+        color: var(--text);
+        font-weight: 500;
+        transition: .25s;
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-keanggotaan:hover {
+        background: #F7F8FA;
+        color: var(--gold);
+    }
+
+    .dropdown-menu {
+        margin-top: 12px;
+        border: none;
+        border-radius: 14px;
+        overflow: hidden;
+        min-width: 220px;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, .12);
+    }
+
+    .dropdown-item {
+        padding: 14px 18px;
+        font-weight: 500;
+        transition: .2s;
+    }
+
+    .dropdown-item:hover {
+        background: var(--gold-light);
+        color: var(--gold);
+    }
+
+    .navbar-toggler {
+        border: none;
+    }
+
+    .navbar-toggler:focus {
+        box-shadow: none;
+    }
+
+    @media(max-width:991px) {
+
+        .siap-navbar {
+            height: auto;
+            padding: 12px 0;
+        }
+
+        .navbar-nav {
+            margin-top: 20px;
+            gap: 2px;
+        }
+
+        .btn-keanggotaan {
+            width: 100%;
+            justify-content: space-between;
+        }
+
+    }
+</style>
