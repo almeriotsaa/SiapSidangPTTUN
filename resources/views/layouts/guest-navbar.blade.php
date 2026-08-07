@@ -1,12 +1,12 @@
 <nav class="navbar navbar-expand-lg siap-navbar sticky-top">
 
-    <div class="container">
+    <div class="container-fluid px-4 px-xxl-5">
 
         <!-- Logo -->
         <a class="navbar-brand d-flex align-items-center" href="/">
 
             <div class="logo-box">
-                <i class="bi bi-building"></i>
+                <img src="{{ asset('assets/images/pttun logo.png') }}" alt="">
             </div>
 
             <div class="ms-3">
@@ -15,13 +15,17 @@
                     SIAP SIDANG
                 </div>
 
+                <div class="brand-sub-title">
+                    PT TUN Jakarta
+                </div>
+
             </div>
 
         </a>
 
         <button class="navbar-toggler"
-                data-bs-toggle="collapse"
-                data-bs-target="#navbarSIAP">
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarSIAP">
 
             <span class="navbar-toggler-icon"></span>
 
@@ -29,7 +33,7 @@
 
         <div class="collapse navbar-collapse" id="navbarSIAP">
 
-            <ul class="navbar-nav mx-auto">
+            <ul class="navbar-nav ms-auto align-items-lg-center">
 
                 <li class="nav-item">
                     <a class="nav-link {{ request()->is('/') ? 'active' : '' }}"
@@ -59,17 +63,31 @@
                     </a>
                 </li>
 
+                <!-- Dropdown Keanggotaan -->
+                <li class="nav-item dropdown ms-lg-2">
+
+                    <a class="btn-keanggotaan dropdown-toggle"
+                        href="#"
+                        data-bs-toggle="dropdown">
+
+                        Keanggotaan
+
+                    </a>
+
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+
+                        <li>
+                            <a class="dropdown-item py-2" href="/login">
+                                <i class="bi bi-box-arrow-in-right me-2"></i>
+                                Login
+                            </a>
+                        </li>
+
+                    </ul>
+
+                </li>
+
             </ul>
-
-            <div class="d-flex">
-
-                <a href="/login" class="btn-login">
-
-                    Login
-
-                </a>
-
-            </div>
 
         </div>
 
@@ -78,143 +96,120 @@
 </nav>
 
 <style>
-    .siap-navbar{
-
-    background:#fff;
-
-    min-height:72px;
-
-    box-shadow:0 3px 12px rgba(0,0,0,.05);
-
-    border-bottom:1px solid #ececec;
-
-}
-
-.logo-box{
-
-    width:32px;
-
-    height:32px;
-
-    border-radius:8px;
-
-    background:#2F6FED;
-
-    color:white;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    font-size:18px;
-
-    font-weight:bold;
-
-}
-
-.brand-title{
-
-    font-weight:700;
-
-    font-size:22px;
-
-    color:#1E293B;
-
-    line-height:1;
-
-}
-
-.brand-subtitle{
-
-    color:#6B7280;
-
-    font-size:12px;
-
-}
-
-.navbar-nav{
-
-    gap:8px;
-
-}
-
-.nav-link{
-
-    color:#4B5563;
-
-    font-weight:500;
-
-    border-radius:8px;
-
-    padding:10px 18px !important;
-
-    transition:.25s;
-
-}
-
-.nav-link:hover{
-
-    background:#EEF4FF;
-
-    color:#2563EB;
-
-}
-
-.nav-link.active{
-
-    background:#E8F1FF;
-
-    color:#2563EB !important;
-
-    font-weight:600;
-
-}
-
-.btn-login{
-
-    border:1px solid #DC2626;
-
-    color:#DC2626;
-
-    text-decoration:none;
-
-    padding:9px 20px;
-
-    border-radius:8px;
-
-    transition:.25s;
-
-    font-weight:500;
-
-}
-
-.btn-login:hover{
-
-    background:#DC2626;
-
-    color:white;
-
-}
-
-@media(max-width:991px){
-
-    .navbar-nav{
-
-        margin-top:20px;
-
-        margin-bottom:20px;
-
+    :root {
+        --navy: #0F2C4C;
+        --gold: #C9A227;
+        --gold-light: #FFF8E8;
+        --text: #4B5563;
     }
 
-    .btn-login{
-
-        width:100%;
-
-        text-align:center;
-
+    .siap-navbar {
+        background: #fff;
+        height: auto;
+        border-bottom: 1px solid #ececec;
+        box-shadow: 0 4px 18px rgba(15, 44, 76, .06);
+        z-index: 999;
     }
 
-}
+    .logo-box img{
+        width: 64px;
+        display: flex;
+    }
+
+    .brand-title {
+        /* font-family: 'Source Serif 4', serif; */
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--navy);
+        letter-spacing: .5px;
+    }
+
+    .brand-sub-title {
+        font-size: 16px;
+        color: var(--gold);
+        font-weight: 500;
+    }
+
+    .nav-link {
+        color: var(--text);
+        font-weight: 500;
+        padding: 10px 18px !important;
+        border-radius: 10px;
+        transition: .25s;
+    }
+
+    .nav-link:hover {
+        background: #F7F8FA;
+        color: var(--navy);
+    }
+
+    .nav-link.active {
+        background: var(--gold-light);
+        color: var(--gold) !important;
+        font-weight: 600;
+    }
+
+    .btn-keanggotaan {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 18px;
+        border-radius: 10px;
+        text-decoration: none;
+        color: var(--text);
+        font-weight: 500;
+        transition: .25s;
+    }
+
+    .btn-keanggotaan:hover {
+        background: #F7F8FA;
+        color: var(--gold);
+    }
+
+    .dropdown-menu {
+        margin-top: 12px;
+        border: none;
+        border-radius: 14px;
+        overflow: hidden;
+        min-width: 220px;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, .12);
+    }
+
+    .dropdown-item {
+        padding: 14px 18px;
+        font-weight: 500;
+        transition: .2s;
+    }
+
+    .dropdown-item:hover {
+        background: var(--gold-light);
+        color: var(--gold);
+    }
+
+    .navbar-toggler {
+        border: none;
+    }
+
+    .navbar-toggler:focus {
+        box-shadow: none;
+    }
+
+    @media(max-width:991px) {
+
+        .siap-navbar {
+            height: auto;
+            padding: 12px 0;
+        }
+
+        .navbar-nav {
+            margin-top: 20px;
+            gap: 2px;
+        }
+
+        .btn-keanggotaan {
+            width: 100%;
+            justify-content: space-between;
+        }
+
+    }
 </style>

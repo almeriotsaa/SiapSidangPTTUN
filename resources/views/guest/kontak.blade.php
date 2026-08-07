@@ -4,82 +4,241 @@
 
 @section('content')
 
-<div class="container py-5">
+<div class="page-container py-5">
 
-<h2 class="fw-bold mb-4">
+    <div class="mb-5">
 
-Kontak Kami
+        <h2 class="page-title">
+            Kontak Kami
+        </h2>
 
-</h2>
+        <p class="page-subtitle">
+            Hubungi Pengadilan Tinggi Tata Usaha Negara Jakarta apabila
+            membutuhkan informasi mengenai SIAP SIDANG maupun jadwal persidangan.
+        </p>
 
-<div class="row">
+    </div>
 
-<div class="col-lg-6">
+    <div class="row g-5 align-items-stretch">
 
-<div class="card shadow-sm border-0">
+        <div class="col-lg-5">
 
-<div class="card-body">
+            <div class="contact-card">
 
-<h5>
+                <h3 class="section-title mb-4">
 
-Pengadilan Tinggi Tata Usaha Negara Jakarta
+                    Pengadilan Tinggi Tata Usaha Negara Jakarta
 
-</h5>
+                </h3>
 
-<hr>
+                <div class="contact-item">
 
-<p>
+                    <div class="contact-icon">
 
-<i class="bi bi-geo-alt-fill"></i>
+                        <i class="bi bi-geo-alt-fill"></i>
 
-Jl. Cikini Raya No.117,
+                    </div>
 
-Jakarta Pusat
+                    <div>
 
-</p>
+                        <h6>Alamat</h6>
 
-<p>
+                        <p>
+                            Jl. Cikini Raya No.117,
+                            Menteng, Jakarta Pusat
+                        </p>
 
-<i class="bi bi-envelope-fill"></i>
+                    </div>
 
-pttun-jakarta.go.id
+                </div>
 
-</p>
+                <div class="contact-item">
 
-<p>
+                    <div class="contact-icon">
 
-<i class="bi bi-telephone-fill"></i>
+                        <i class="bi bi-telephone-fill"></i>
 
-(021) xxxx xxxx
+                    </div>
 
-</p>
+                    <div>
+
+                        <h6>Telepon</h6>
+
+                        <p>(021) xxxx xxxx</p>
+
+                    </div>
+
+                </div>
+
+                <div class="contact-item">
+
+                    <div class="contact-icon">
+
+                        <i class="bi bi-envelope-fill"></i>
+
+                    </div>
+
+                    <div>
+
+                        <h6>Email</h6>
+
+                        <p>info@pttun-jakarta.go.id</p>
+
+                    </div>
+
+                </div>
+
+                <div class="contact-item">
+
+                    <div class="contact-icon">
+
+                        <i class="bi bi-globe"></i>
+
+                    </div>
+
+                    <div>
+
+                        <h6>Website</h6>
+
+                        <p>www.pttun-jakarta.go.id</p>
+
+                    </div>
+
+                </div>
+
+                <div class="contact-item mb-0">
+
+                    <div class="contact-icon">
+
+                        <i class="bi bi-clock-fill"></i>
+
+                    </div>
+
+                    <div>
+
+                        <h6>Jam Operasional</h6>
+
+                        <p>
+                            Senin - Jumat
+                            <br>
+                            08.00 - 16.30 WIB
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-7">
+
+            <div class="map-card">
+
+                <iframe
+                    src="https://maps.google.com/maps?q=Pengadilan%20Tinggi%20Tata%20Usaha%20Negara%20Jakarta&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                    loading="lazy">
+                </iframe>
+
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
 
-</div>
+<style>
+    .page-container {
+        width: 100%;
+        max-width: 1700px;
+        margin: 0 auto;
+        padding: 0 32px;
+    }
 
-</div>
+    .page-title {
+        font-weight: 700;
+        color: #17375E;
+    }
 
-<div class="col-lg-6">
+    .page-subtitle {
+        max-width: 700px;
+        color: #6B7280;
+        font-size: 16px;
+    }
 
-<iframe
+    .section-title {
+        color: #17375E;
+        font-weight: 700;
+    }
 
-src="https://maps.google.com/maps?q=jakarta&t=&z=13&ie=UTF8&iwloc=&output=embed"
+    .contact-card {
 
-width="100%"
+        background: white;
+        border-radius: 22px;
+        padding: 35px;
+        height: 100%;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, .06);
 
-height="350"
+    }
 
-style="border:0;border-radius:12px;"
+    .contact-item {
 
-loading="lazy">
+        display: flex;
+        gap: 18px;
+        margin-bottom: 28px;
 
-</iframe>
+    }
 
-</div>
+    .contact-icon {
 
-</div>
+        width: 54px;
+        height: 54px;
+        border-radius: 14px;
+        background: #FFF6DE;
+        color: #E4B028;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        flex-shrink: 0;
 
-</div>
+    }
+
+    .contact-item h6 {
+
+        color: #17375E;
+        margin-bottom: 6px;
+        font-weight: 700;
+
+    }
+
+    .contact-item p {
+
+        color: #6B7280;
+        margin: 0;
+        line-height: 1.7;
+
+    }
+
+    .map-card {
+
+        height: 100%;
+        min-height: 520px;
+        border-radius: 22px;
+        overflow: hidden;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, .06);
+
+    }
+
+    .map-card iframe {
+
+        width: 100%;
+        height: 100%;
+        border: 0;
+
+    }
+</style>
 
 @endsection
