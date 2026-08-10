@@ -15,13 +15,13 @@
 
                 <h1 class="title-hero">
 
-                    SIAP SIDANG -
+                    SIAP SIDANG
 
                 </h1>
 
                 <h4 class="sub-title mb-3">
 
-                    Pengadilan Tingi Tata Usaha Negara Jakarta
+                    Pengadilan Tinggi Tata Usaha Negara Jakarta
 
                 </h4>
 
@@ -105,7 +105,7 @@
                         01
                     </span>
 
-                    <div class="feature-icon bg-primary">
+                    <div class="feature-icon icon-navy">
 
                         <i class="bi bi-calendar-week"></i>
 
@@ -132,7 +132,7 @@
                         02
                     </span>
 
-                    <div class="feature-icon bg-success">
+                    <div class="feature-icon icon-gold">
 
                         <i class="bi bi-person-check"></i>
 
@@ -159,7 +159,7 @@
                         03
                     </span>
 
-                    <div class="feature-icon bg-danger">
+                    <div class="feature-icon icon-slate">
 
                         <i class="bi bi-shield-lock"></i>
 
@@ -170,7 +170,7 @@
                     </h4>
 
                     <p>
-                        Setiap pengguna sistem Siap Sidang memperoleh hak akses sesuai perannya, mulai dari Admin & Front Office (Administrasi).
+                        Setiap pengguna sistem Siap Sidang memperoleh hak akses sesuai perannya, mulai dari Admin (Administrasi) & Front Office.
                     </p>
 
                 </div>
@@ -197,21 +197,24 @@
         }
     }
 
+    /* ===== Hero ===== */
     .hero-section {
         background-color: #0B1849;
     }
 
     .title-hero {
-        font-size: 36px;
-        font-weight: 600;
-        color: #E4B028;
-        /* font-family: 'Source Serif 4', serif; */
+        font-size: 40px;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 6px;
     }
 
     .sub-title {
         font-size: 16px;
-        font-weight: 500;
+        font-weight: 600;
         color: #E4B028;
+        text-transform: uppercase;
+        letter-spacing: .03em;
     }
 
     .deskripsi {
@@ -219,12 +222,14 @@
         text-align: justify;
         line-height: 1.9;
         max-width: 550px;
+        color: rgba(255, 255, 255, .82);
     }
 
     .hero-carousel {
         border-radius: 22px;
         overflow: hidden;
         border: 4px solid #fff;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, .25);
     }
 
     .image-hero {
@@ -233,13 +238,9 @@
         object-fit: cover;
     }
 
-    /* Hilangkan tombol */
+    /* Hilangkan tombol & indikator carousel bawaan Bootstrap */
     .carousel-control-prev,
-    .carousel-control-next {
-        display: none;
-    }
-
-    /* Hilangkan indikator */
+    .carousel-control-next,
     .carousel-indicators {
         display: none;
     }
@@ -253,19 +254,16 @@
         transform: scale(1.05);
     }
 
+    /* ===== Fitur ===== */
     .fitur-section {
-
         background: #FFFBEF;
         position: relative;
         overflow: hidden;
         padding: 90px 0;
-
     }
 
     /* background ornament */
-
     .fitur-section::before {
-
         content: "";
         position: absolute;
         width: 420px;
@@ -274,11 +272,9 @@
         background: rgba(23, 55, 94, .05);
         top: -180px;
         left: -150px;
-
     }
 
     .fitur-section::after {
-
         content: "";
         position: absolute;
         width: 350px;
@@ -287,34 +283,26 @@
         background: rgba(176, 141, 87, .08);
         right: -120px;
         bottom: -150px;
-
     }
 
     .section-title {
-
         position: relative;
         z-index: 2;
-
     }
 
     .section-title h2 {
-
         font-size: 48px;
         font-weight: 700;
         color: #17375E;
-        /* font-family: 'Source Serif 4', serif; */
-
     }
 
     .section-title p {
-
         max-width: 650px;
         font-size: 15px;
-
+        margin-inline: auto;
     }
 
     .feature-card {
-
         position: relative;
         background: white;
         border-radius: 18px;
@@ -324,11 +312,9 @@
         overflow: hidden;
         border: 1px solid #E5E7EB;
         box-shadow: 0 10px 25px rgba(0, 0, 0, .05);
-
     }
 
     .feature-card::before {
-
         content: "";
         position: absolute;
         top: 0;
@@ -336,18 +322,14 @@
         width: 100%;
         height: 5px;
         background-color: #17375E;
-
     }
 
     .feature-card:hover {
-
         transform: translateY(-10px);
         box-shadow: 0 18px 35px rgba(0, 0, 0, .12);
-
     }
 
     .feature-icon {
-
         width: 90px;
         height: 90px;
         border-radius: 50%;
@@ -358,34 +340,40 @@
         color: white;
         font-size: 36px;
         margin-bottom: 25px;
+    }
 
+    /* Palet ikon mengikuti warna brand (navy, gold, slate) — bukan warna default Bootstrap */
+    .icon-navy {
+        background-color: #17375E;
+    }
+
+    .icon-gold {
+        background-color: #C9A227;
+    }
+
+    .icon-slate {
+        background-color: #4B5563;
     }
 
     .feature-card h4 {
-
         font-weight: 700;
         color: #17375E;
         margin-bottom: 15px;
-
     }
 
     .feature-card p {
-
         color: #6B7280;
         line-height: 1.8;
         font-size: 15px;
-
     }
 
     .feature-number {
-
         position: absolute;
         top: 20px;
         right: 25px;
         font-size: 50px;
         font-weight: 700;
         color: #EEF2F7;
-
     }
 </style>
 

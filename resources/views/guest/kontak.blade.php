@@ -8,7 +8,7 @@
 
     <div class="mb-5">
 
-        <h2 class="page-title">
+        <h2 class="page-title h2 fw-bold mb-1">
             Kontak Kami
         </h2>
 
@@ -44,8 +44,7 @@
                         <h6>Alamat</h6>
 
                         <p>
-                            Jl. Cikini Raya No.117,
-                            Menteng, Jakarta Pusat
+                            Jalan Cikini Raya No. 117, Kec. Menteng, Kota Jakarta Pusat, DKI Jakarta 10330
                         </p>
 
                     </div>
@@ -64,7 +63,7 @@
 
                         <h6>Telepon</h6>
 
-                        <p>(021) xxxx xxxx</p>
+                        <p>(021) 3192 6162</p>
 
                     </div>
 
@@ -82,7 +81,7 @@
 
                         <h6>Email</h6>
 
-                        <p>info@pttun-jakarta.go.id</p>
+                        <p>pttun.jakarta@gmail.com</p>
 
                     </div>
 
@@ -100,7 +99,7 @@
 
                         <h6>Website</h6>
 
-                        <p>www.pttun-jakarta.go.id</p>
+                        <p>pttun-jakarta.go.id</p>
 
                     </div>
 

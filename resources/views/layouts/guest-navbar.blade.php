@@ -16,7 +16,7 @@
                 </div>
 
                 <div class="brand-sub-title">
-                    PT TUN Jakarta
+                    PT TUN Jakarta (V 1.0)
                 </div>
 
             </div>
@@ -64,22 +64,24 @@
                 </li>
 
                 <!-- Dropdown Keanggotaan -->
-                <li class="nav-item dropdown ms-lg-2">
+                <li class="nav-item dropdown">
 
                     <a class="btn-keanggotaan dropdown-toggle"
                         href="#"
-                        data-bs-toggle="dropdown">
+                        role="button"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false">
 
                         Keanggotaan
 
                     </a>
 
-                    <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                    <ul class="dropdown-menu dropdown-menu-end membership-dropdown">
 
                         <li>
-                            <a class="dropdown-item py-2" href="/login">
-                                <i class="bi bi-box-arrow-in-right me-2"></i>
-                                Login
+                            <a class="dropdown-item membership-item" href="/login">
+                                <i class="bi bi-box-arrow-in-right"></i>
+                                <span>Login</span>
                             </a>
                         </li>
 
@@ -111,13 +113,12 @@
         z-index: 999;
     }
 
-    .logo-box img{
+    .logo-box img {
         width: 64px;
         display: flex;
     }
 
     .brand-title {
-        /* font-family: 'Source Serif 4', serif; */
         font-size: 2rem;
         font-weight: 700;
         color: var(--navy);
@@ -175,15 +176,46 @@
         box-shadow: 0 12px 30px rgba(0, 0, 0, .12);
     }
 
-    .dropdown-item {
-        padding: 14px 18px;
-        font-weight: 500;
-        transition: .2s;
+    .membership-dropdown {
+        min-width: 180px;
+        padding: 8px;
+        margin-top: 10px !important;
+
+        border: 1px solid #eeeeee;
+        border-radius: 14px;
+        background: #ffffff;
+
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
     }
 
-    .dropdown-item:hover {
-        background: var(--gold-light);
-        color: var(--gold);
+    .membership-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        padding: 10px 14px !important;
+
+        border-radius: 9px;
+
+        color: #26364a !important;
+        font-size: 15px;
+        font-weight: 500;
+
+        transition: all 0.2s ease;
+    }
+
+    .membership-item i {
+        font-size: 18px;
+        color: #17375E;
+    }
+
+    .membership-item:hover {
+        background: #f5f7fa !important;
+        color: #17375E !important;
+    }
+
+    .membership-item:hover i {
+        color: #c9a227;
     }
 
     .navbar-toggler {

@@ -1,14 +1,13 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Guest\JadwalSidangController;
 
 Route::get('/', function () {
     return view('guest.home');
 });
 
-Route::get('/jadwal', function () {
-    return view('guest.jadwal');
-});
+Route::get('/jadwal',[JadwalSidangController::class,'index']);
 
 Route::get('/kontak', function () {
     return view('guest.kontak');

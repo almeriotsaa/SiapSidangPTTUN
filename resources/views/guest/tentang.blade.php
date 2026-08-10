@@ -8,40 +8,44 @@
 
     <!-- Tentang Sistem -->
 
-    <div class="row align-items-center g-5 mb-5">
+    <div class="content-panel panel-tint-blue mb-5">
 
-        <div class="col-lg-5">
+        <div class="row align-items-center g-5">
 
-            <img src="{{ asset('assets/images/pttun 2.jfif') }}"
-                class="img-fluid">
+            <div class="col-lg-5">
 
-        </div>
+                <img src="{{ asset('assets/images/pttun 2.jfif') }}"
+                    class="img-fluid about-image">
 
-        <div class="col-lg-7">
+            </div>
 
-            <h3 class="section-title">
+            <div class="col-lg-7">
 
-                Apa itu SIAP SIDANG?
+                <h3 class="section-title mb-3">
 
-            </h3>
+                    Apa itu SIAP SIDANG?
 
-            <p class="teks-deskripsi">
+                </h3>
 
-                SIAP SIDANG merupakan Sistem Informasi Presensi Sidang yang
-                dikembangkan untuk membantu proses administrasi persidangan
-                di Pengadilan Tinggi Tata Usaha Negara Jakarta.
+                <p class="teks-deskripsi">
 
-            </p>
+                    SIAP SIDANG merupakan Sistem Informasi Presensi Sidang yang
+                    dikembangkan untuk membantu proses administrasi persidangan
+                    di Pengadilan Tinggi Tata Usaha Negara Jakarta.
 
-            <p class="teks-deskripsi2">
+                </p>
 
-                Melalui sistem ini, masyarakat dapat melihat jadwal sidang
-                secara online, sementara petugas internal dapat melakukan
-                validasi kehadiran pihak berperkara secara real-time sehingga
-                informasi yang diterima Panitera Pengganti menjadi lebih cepat
-                dan akurat.
+                <p class="teks-deskripsi">
 
-            </p>
+                    Melalui sistem ini, masyarakat dapat melihat jadwal sidang
+                    secara online, sementara petugas internal dapat melakukan
+                    validasi kehadiran pihak berperkara secara real-time sehingga
+                    informasi yang diterima Panitera Pengganti menjadi lebih cepat
+                    dan akurat.
+
+                </p>
+
+            </div>
 
         </div>
 
@@ -49,67 +53,71 @@
 
     <!-- Tujuan -->
 
-    <div class="row g-4 mb-5">
+    <div class="content-panel panel-tint-gold mb-5">
 
-        <div class="col-md-3">
+        <div class="row g-4">
 
-            <div class="feature-card">
+            <div class="col-md-3">
 
-                <i class="bi bi-calendar-week"></i>
+                <div class="feature-card">
 
-                <h5>Jadwal Sidang</h5>
+                    <i class="bi bi-calendar-week"></i>
 
-                <p>
-                    Menyediakan informasi jadwal sidang secara online.
-                </p>
+                    <h5>Jadwal Sidang</h5>
 
-            </div>
+                    <p>
+                        Menyediakan informasi jadwal sidang secara online.
+                    </p>
 
-        </div>
-
-        <div class="col-md-3">
-
-            <div class="feature-card">
-
-                <i class="bi bi-person-check"></i>
-
-                <h5>Validasi</h5>
-
-                <p>
-                    Mempermudah validasi kehadiran para pihak.
-                </p>
+                </div>
 
             </div>
 
-        </div>
+            <div class="col-md-3">
 
-        <div class="col-md-3">
+                <div class="feature-card">
 
-            <div class="feature-card">
+                    <i class="bi bi-person-check"></i>
 
-                <i class="bi bi-lightning-charge"></i>
+                    <h5>Validasi</h5>
 
-                <h5>Real-time</h5>
+                    <p>
+                        Mempermudah validasi kehadiran para pihak.
+                    </p>
 
-                <p>
-                    Informasi langsung diterima oleh Panitera Pengganti.
-                </p>
+                </div>
 
             </div>
 
-        </div>
+            <div class="col-md-3">
 
-        <div class="col-md-3">
+                <div class="feature-card">
 
-            <div class="feature-card">
+                    <i class="bi bi-lightning-charge"></i>
 
-                <i class="bi bi-shield-check"></i>
+                    <h5>Real-time</h5>
 
-                <h5>Efisien</h5>
+                    <p>
+                        Informasi langsung diterima oleh Pengguna.
+                    </p>
 
-                <p>
-                    Mengurangi proses administrasi manual.
-                </p>
+                </div>
+
+            </div>
+
+            <div class="col-md-3">
+
+                <div class="feature-card">
+
+                    <i class="bi bi-shield-check"></i>
+
+                    <h5>Efisien</h5>
+
+                    <p>
+                        Mengurangi proses administrasi manual.
+                    </p>
+
+                </div>
 
             </div>
 
@@ -119,15 +127,15 @@
 
     <!-- Developer -->
 
-    <div class="developer-section">
+    <div class="content-panel panel-tint-blue developer-section">
 
-        <h2 class="section-title mb-4">
+        <h2 class="section-title mb-3">
 
             Dikembangkan Oleh
 
         </h2>
 
-        <p class="mb-4">
+        <p class="teks-deskripsi mb-4">
 
             Website SIAP SIDANG dikembangkan sebagai bagian dari program
             magang mahasiswa <strong>CCIT Fakultas Teknik Universitas Indonesia</strong>
@@ -147,7 +155,7 @@
 
                     <h5>Almerio Tsany Fauzan Setiawan</h5>
 
-                    <span>Full Stack Developer</span>
+                    <span class="developer-role">Full Stack Developer</span>
 
                 </div>
 
@@ -163,7 +171,7 @@
 
                     <h5>Michael Timothy Sipahutar</h5>
 
-                    <span>Full Stack Developer</span>
+                    <span class="developer-role">Full Stack Developer</span>
 
                 </div>
 
@@ -179,7 +187,7 @@
 
                     <h5>Fajar Rizky Handani Hasibuan</h5>
 
-                    <span>Full Stack Developer</span>
+                    <span class="developer-role">Full Stack Developer</span>
 
                 </div>
 
@@ -195,7 +203,7 @@
 
                     <h5>Muhammad Faiq Al Harits</h5>
 
-                    <span>Full Stack Developer</span>
+                    <span class="developer-role">Full Stack Developer</span>
 
                 </div>
 
@@ -226,14 +234,39 @@
         font-weight: 700;
     }
 
+    .content-panel {
+        border-radius: 24px;
+        padding: 45px;
+    }
+
+    @media (max-width:768px) {
+        .content-panel {
+            padding: 28px 20px;
+        }
+    }
+
+    .panel-tint-blue {
+        background: #EFF5FB;
+    }
+
+    .panel-tint-gold {
+        background: #FBF6E9;
+    }
+
+    .content-panel .feature-card,
+    .content-panel .developer-card {
+        background: #fff;
+    }
+
+    .about-image {
+        border-radius: 18px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, .08);
+    }
+
     .teks-deskripsi {
         text-align: justify;
         line-height: 1.9;
-    }
-
-    .teks-deskripsi2 {
-        text-align: justify;
-        line-height: 1.9;
+        color: #4b5563;
     }
 
     .feature-card {
@@ -248,6 +281,7 @@
 
     .feature-card:hover {
         transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, .1);
     }
 
     .feature-card i {
@@ -256,16 +290,39 @@
         margin-bottom: 18px;
     }
 
-    .developer-section {
-        margin-top: 80px;
+    .feature-card h5 {
+        color: #17375E;
+        font-weight: 700;
+        margin-bottom: 10px;
     }
 
+    .feature-card p {
+        color: #6b7280;
+        font-size: .92rem;
+        margin-bottom: 0;
+    }
+
+    /* ===== Section developer ===== */
     .developer-card {
         text-align: center;
         background: white;
         border-radius: 18px;
         padding: 35px 20px;
         box-shadow: 0 10px 30px rgba(0, 0, 0, .06);
+        height: 100%;
+        transition: .3s;
+    }
+
+    .developer-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, .1);
+    }
+
+    .developer-card h5 {
+        color: #17375E;
+        font-weight: 700;
+        font-size: .95rem;
+        margin-bottom: 6px;
     }
 
     .developer-avatar {
@@ -281,6 +338,13 @@
         justify-content: center;
         font-size: 30px;
         font-weight: bold;
+    }
+
+    .developer-role {
+        display: inline-block;
+        font-size: .8rem;
+        color: #9ca3af;
+        font-weight: 500;
     }
 </style>
 

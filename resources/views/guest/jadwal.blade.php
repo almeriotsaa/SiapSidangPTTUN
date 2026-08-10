@@ -5,450 +5,398 @@
 @section('content')
 
 <style>
-    :root {
-        --tun-navy: #0f2c4c;
-        --tun-gold: #c9a227;
-        --tun-green: #198754;
-    }
-
     .page-container {
         width: 100%;
         max-width: 1700px;
-        margin-inline: auto;
-        padding-inline: 32px;
+        margin: auto;
+        padding-inline: 24px;
     }
 
-    @media (max-width:992px) {
-        .page-container {
-            padding-inline: 20px;
-        }
-    }
-
-    .page-title {
+    .title-main {
         font-weight: 700;
-        color: var(--tun-navy);
+        color: #17375E;
     }
 
-    .schedule-card {
-        border: none;
-        border-radius: 16px;
-        overflow: hidden;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, .08);
+    /* ===== Toolbar filter ===== */
+    .filter-card {
+        background: #fff;
+        border: 1px solid #f1f1f1;
+        border-radius: .75rem;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, .04);
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 1.5rem;
     }
 
-    .table thead {
-        background: var(--tun-navy);
-        color: #fff;
-    }
-
-    .table thead th {
-        padding: 16px;
+    .filter-card .form-label {
+        font-size: .78rem;
         font-weight: 600;
-        text-align: center;
-        vertical-align: middle;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: .03em;
+        margin-bottom: .4rem;
     }
 
-    .table tbody td {
-        padding: 18px 14px;
+    .btn-tampilkan {
+        background-color: #17375E;
+    }
+
+    .btn-tampilkan:hover {
+        background-color: #17375E;
+    }
+
+    /* ===== Table, konsisten dengan halaman admin ===== */
+    .table-card {
+        background: #fff;
+        border: 1px solid #f1f1f1;
+        border-radius: .75rem;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, .04);
+        overflow: hidden;
+    }
+
+    .table-card thead th {
+        background: #f9fafb;
+        font-size: .72rem;
+        font-weight: 600;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: .03em;
+        white-space: nowrap;
+    }
+
+    .table-card tbody td {
         vertical-align: top;
+        font-size: .9rem;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
     }
 
-    .label {
-        font-weight: 700;
-        color: var(--tun-navy);
+    .table-card tbody tr {
+        border-top: 1px solid #f1f1f1;
     }
 
-    .divider {
-        border-bottom: 1px solid #e9ecef;
-        margin: 6px 0;
+    .table-card tbody tr:hover {
+        background: #fafafa;
     }
 
-    .case-badge {
+    .table-responsive-wrap {
+        overflow-x: auto;
+    }
 
+    /* ===== Detail kecil di dalam sel ===== */
+    .case-code {
+        font-weight: 600;
+        color: #111827;
+    }
+
+    .meta-line {
+        font-size: .85rem;
+        color: #374151;
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+        margin-bottom: .25rem;
+    }
+
+    .meta-line:last-child {
+        margin-bottom: 0;
+    }
+
+    .meta-line i {
+        color: #9ca3af;
+        font-size: .8rem;
+    }
+
+    .judge-row {
+        font-size: .85rem;
+        color: #374151;
+        margin-bottom: .35rem;
+        display: flex;
+        gap: .5rem;
+        align-items: baseline;
+    }
+
+    .judge-row:last-child {
+        margin-bottom: 0;
+    }
+
+    .judge-tag {
+        flex: 0 0 auto;
         display: inline-block;
-        background: #EEF5FF;
-        color: #17375E;
-        padding: 8px 15px;
-        border-radius: 10px;
+        background: #f3f4f6;
+        color: #4b5563;
+        font-size: .68rem;
         font-weight: 700;
-        font-size: .92rem;
-
+        letter-spacing: .02em;
+        padding: .15rem .4rem;
+        border-radius: .35rem;
+        min-width: 32px;
+        text-align: center;
     }
 
-    .judge-item {
-
-        margin-bottom: 10px;
-
+    .party-row {
+        font-size: .85rem;
+        color: #374151;
+        margin-bottom: .5rem;
     }
 
-    .judge-role {
-
-        display: inline-block;
-        background: #17375E;
-        color: white;
-        padding: 3px 9px;
-        border-radius: 5px;
-        font-size: 12px;
-        margin-right: 8px;
-
+    .party-row:last-child {
+        margin-bottom: 0;
     }
 
-    .page-title {
-
-        font-size: 34px;
+    .party-role {
+        display: block;
+        font-size: .68rem;
         font-weight: 700;
-        color: #17375E;
-
+        color: #9ca3af;
+        text-transform: uppercase;
+        letter-spacing: .03em;
+        margin-bottom: .1rem;
     }
 
-    .page-subtitle {
+    .att-name {
+        font-size: .82rem;
+        color: #374151;
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+        margin-bottom: .4rem;
+    }
 
-        color: #6B7280;
-        margin-top: 6px;
+    .att-name:last-child {
+        margin-bottom: 0;
+    }
 
+    .att-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        flex: 0 0 auto;
+    }
+
+    .att-dot.hadir {
+        background: #16a34a;
+    }
+
+    .att-dot.tidak {
+        background: #9ca3af;
+    }
+
+    .empty-state {
+        text-align: center;
+        color: #9ca3af;
+        padding: 3rem 1rem;
+        font-size: .9rem;
     }
 
     .filter-card {
-
-        border: none;
-        border-radius: 18px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, .06);
-
+        background: #fff;
+        border: 1px solid #ececec;
+        border-radius: 16px;
+        padding: 24px 28px;
     }
 
-    .btn-search {
-
-        background: #17375E;
-        color: white;
-        border-radius: 10px;
-        padding: 11px;
-
+    .attendance-legend {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        flex-wrap: wrap;
     }
 
-    .btn-search:hover {
-
-        background: #0F2C4C;
-        color: white;
-
-    }
-
-    .schedule-card {
-
-        border: none;
-        border-radius: 18px;
-        overflow: hidden;
-        box-shadow: 0 15px 35px rgba(0, 0, 0, .08);
-
-    }
-
-    .table tbody tr:hover {
-
-        background: #F8FBFF;
-
-    }
-
-    .table thead {
-
-        position: sticky;
-        top: 0;
-        z-index: 10;
-
-    }
-
-    .schedule-toolbar {
-
-        margin-bottom: 28px;
-
-        padding-bottom: 20px;
-
-        border-bottom: 1px solid #E8EDF3;
-
-    }
-
-    .schedule-toolbar .form-label {
-
+    .legend-title {
+        font-size: 14px;
         font-weight: 600;
-        color: #17375E;
-        margin-bottom: 10px;
-
+        color: #6B7280;
+        margin-right: 8px;
     }
 
-    .toolbar-input {
-
-        height: 52px;
-
-        border-radius: 12px;
-
-        border: 1px solid #D6DEE8;
-
-        padding-inline: 16px;
-
-        transition: .25s;
-
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        color: #374151;
     }
 
-    .toolbar-input:focus {
-
-        border-color: #17375E;
-
-        box-shadow: 0 0 0 .18rem rgba(23, 55, 94, .12);
-
+    .legend-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        display: inline-block;
     }
 
-    .btn-generate {
-
-        height: 52px;
-
-        border: none;
-
-        border-radius: 12px;
-
-        background: #17375E;
-
-        color: white;
-
-        font-weight: 600;
-
-        transition: .25s;
-
+    .legend-dot.hadir {
+        background: #16a34a;
     }
 
-    .btn-generate:hover {
-
-        background: #0F2C4C;
-
-        transform: translateY(-2px);
-
+    .legend-dot.belum {
+        background: #9CA3AF;
     }
 </style>
 
-<div class="page-container py-5">
+<section class="hero-section py-5">
+    <div class="page-container">
 
-    <div class="page-header">
+        {{-- Header --}}
+        <div class="mb-4">
+            <h1 class="title-main h2 fw-bold mb-1">Jadwal Sidang</h1>
+            <p class="text-secondary mb-0">
+                Informasi jadwal persidangan yang dapat diakses oleh masyarakat secara online
+            </p>
+        </div>
 
-        <h2 class="page-title">
-            Jadwal Sidang
-        </h2>
+        {{-- Filter --}}
+        <div class="filter-card">
 
-        <p class="page-subtitle">
-            Informasi jadwal persidangan yang dapat diakses oleh masyarakat secara online.
-        </p>
+            <div class="d-flex justify-content-between align-items-end flex-wrap gap-4">
 
-    </div>
+                <!-- Filter -->
+                <form method="GET" class="d-flex align-items-end gap-3">
 
-    <!-- Filter -->
-    <div class="schedule-toolbar mb-4">
+                    <div>
+                        <label class="form-label">Pilih Tanggal Sidang</label>
 
-        <div class="row align-items-end">
+                        <input
+                            type="date"
+                            name="tanggal"
+                            value="{{ request('tanggal', now()->format('Y-m-d')) }}"
+                            class="form-control">
+                    </div>
 
-            <div class="col-lg-4">
+                    <div>
+                        <button type="submit"
+                            class="btn btn-tampilkan d-flex align-items-center gap-2 text-white">
+                            <i class="bi bi-arrow-repeat"></i>
+                            Tampilkan
+                        </button>
+                    </div>
 
-                <label class="form-label">
-                    Pilih Tanggal Sidang
-                </label>
+                </form>
 
-                <input
-                    type="date"
-                    class="form-control toolbar-input">
+                <!-- Keterangan -->
+                <div class="attendance-legend">
 
-            </div>
+                    <span class="legend-title">Keterangan</span>
 
-            <div class="col-lg-3">
+                    <div class="legend-item">
+                        <span class="legend-dot hadir"></span>
+                        <span>Hadir</span>
+                    </div>
 
-                <button class="btn btn-generate w-100">
+                    <div class="legend-item">
+                        <span class="legend-dot belum"></span>
+                        <span>Belum Hadir</span>
+                    </div>
 
-                    <i class="bi bi-arrow-repeat me-2"></i>
-
-                    Tampilkan
-
-                </button>
+                </div>
 
             </div>
 
         </div>
 
-    </div>
-
-    <div class="card schedule-card">
-
-        <div class="table-responsive">
-
-            <table class="table table-hover align-middle mb-0">
-
+        {{-- Table --}}
+        <div class="table-card table-responsive-wrap">
+            <table class="table table-borderless mb-0">
                 <thead>
-
                     <tr>
-                        <th width="5%">No</th>
-                        <th width="15%">No Perkara</th>
-                        <th width="17%">Waktu & Ruang</th>
-                        <th width="20%">Agenda</th>
-                        <th width="23%">Majelis Hakim / PP</th>
-                        <th width="15%">Pihak</th>
-                        <th width="10%">Kehadiran</th>
+                        <th class="px-3 py-3">No</th>
+                        <th class="px-3 py-3">No. Perkara</th>
+                        <th class="px-3 py-3">Waktu &amp; Ruang</th>
+                        <th class="px-3 py-3">Agenda</th>
+                        <th class="px-3 py-3">Majelis Hakim &amp; Panitera Pengganti</th>
+                        <th class="px-3 py-3">Penggugat</th>
+                        <th class="px-3 py-3">Tergugat</th>
+                        <th class="px-3 py-3">Kehadiran</th>
                     </tr>
-
                 </thead>
-
                 <tbody>
-
+                    @forelse ($jadwal as $item)
                     <tr>
+                        <td class="px-3 text-secondary">{{ $loop->iteration }}</td>
 
-                        <td class="text-center">
-                            <strong>1</strong>
+                        <td class="px-3">
+                            <span class="case-code">{{ $item->perkara->nomor_perkara }}</span>
                         </td>
 
-                        <td>
-                            <span class="case-badge">
-
-                                23/G/2026/PT.TUN.JKT
-
-                            </span>
+                        <td class="px-3">
+                            <div class="meta-line">
+                                <i class="bi bi-calendar3"></i>
+                                {{ \Carbon\Carbon::parse($item->tanggal_sidang)->translatedFormat('d F Y') }}
+                            </div>
+                            <div class="meta-line">
+                                <i class="bi bi-clock"></i>
+                                {{ substr($item->jam_sidang, 0, 5) }} WIB
+                            </div>
+                            <div class="meta-line">
+                                <i class="bi bi-door-open"></i>
+                                {{ $item->ruang_sidang }}
+                            </div>
                         </td>
 
-                        <td>
-
-                            <div class="schedule-info">
-
-                                <div>
-
-                                    <i class="bi bi-calendar3"></i>
-
-                                    05 Agustus 2026
-
-                                </div>
-
-                                <div>
-
-                                    <i class="bi bi-clock"></i>
-
-                                    10.00 WIB
-
-                                </div>
-
-                                <div>
-
-                                    <i class="bi bi-door-open"></i>
-
-                                    Ruang Sidang I
-
-                                </div>
-
-                            </div>
-
+                        <td class="px-3">
+                            {{ $item->perkara->agenda }}
                         </td>
 
-                        <td>
-
-                            Pemeriksaan Persiapan
-                            <br>
-                            (Perbaikan Gugatan &
-                            Surat Kuasa)
-
+                        {{-- Digabung: Hakim Ketua, Hakim Anggota I, Hakim Anggota II, Panitera Pengganti --}}
+                        <td class="px-3">
+                            <div class="judge-row">
+                                <span class="judge-tag">HK</span>
+                                <span>{{ $item->hakimKetua->nama }}</span>
+                            </div>
+                            <div class="judge-row">
+                                <span class="judge-tag">HA1</span>
+                                <span>{{ $item->hakimAnggota1->nama }}</span>
+                            </div>
+                            <div class="judge-row">
+                                <span class="judge-tag">HA2</span>
+                                <span>{{ $item->hakimAnggota2->nama }}</span>
+                            </div>
+                            <div class="judge-row">
+                                <span class="judge-tag">PP</span>
+                                <span>{{ $item->panitera->nama }}</span>
+                            </div>
                         </td>
 
-                        <td>
-
-                            <div class="judge-item">
-
-                                <span class="judge-role">
-
-                                    HK
-
-                                </span>
-
-                                Ulia Alba, S.H., M.H.
-
-                            </div>
-
-                            <div class="judge-item">
-
-                                <span class="judge-role">
-
-                                    HA1
-
-                                </span>
-
-                                Listyorani Imawati
-
-                            </div>
-
-                            <div class="judge-item">
-
-                                <span class="judge-role">
-
-                                    HA2
-
-                                </span>
-
-                                Berdyan Shonata
-
-                            </div>
-
-                            <div class="judge-item">
-
-                                <span class="judge-role">
-
-                                    PP
-
-                                </span>
-
-                                Hambali, S.H., M.H.
-
-                            </div>
-
+                        {{-- Penggugat --}}
+                        <td class="px-3">
+                            @forelse ($item->perkara->pihakPerkara->where('tipe', 'penggugat') as $pihak)
+                            <div class="party-row">{{ $pihak->nama }}</div>
+                            @empty
+                            <span class="text-secondary">-</span>
+                            @endforelse
                         </td>
 
-                        <td>
-
-                            <div>
-                                <span class="label">
-                                    Penggugat :
-                                </span>
-                                Ir. Rully Chairul Azwar
-                            </div>
-
-                            <div class="divider"></div>
-
-                            <div>
-                                <span class="label">
-                                    Tergugat :
-                                </span>
-
-                                Kepala Kantor Pertanahan
-                                Kabupaten Pandeglang
-
-                            </div>
-
+                        {{-- Tergugat --}}
+                        <td class="px-3">
+                            @forelse ($item->perkara->pihakPerkara->where('tipe', 'tergugat') as $pihak)
+                            <div class="party-row">{{ $pihak->nama }}</div>
+                            @empty
+                            <span class="text-secondary">-</span>
+                            @endforelse
                         </td>
 
-                        <td>
-
-                            <span class="badge bg-success">
-
-                                Penggugat Hadir
-
-                            </span>
-
-                            <br><br>
-
-                            <span class="badge bg-success">
-
-                                Tergugat Hadir
-
-                            </span>
-
+                        <td class="px-3">
+                            @foreach ($item->kehadiran as $hadir)
+                            <div class="att-name">
+                                <span class="att-dot {{ $hadir->status == 'Hadir' ? 'hadir' : 'tidak' }}"></span>
+                                {{ $hadir->pihak->nama }}
+                            </div>
+                            @endforeach
                         </td>
-
                     </tr>
-
+                    @empty
+                    <tr>
+                        <td colspan="8" class="p-0">
+                            <p class="empty-state mb-0">
+                                Belum ada jadwal sidang untuk tanggal yang dipilih.
+                            </p>
+                        </td>
+                    </tr>
+                    @endforelse
                 </tbody>
-
             </table>
-
         </div>
 
     </div>
-
-</div>
+</section>
 
 @endsection
