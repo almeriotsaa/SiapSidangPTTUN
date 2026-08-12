@@ -14,19 +14,19 @@ class Perkara extends Model
         'agenda',
     ];
 
-    public function pihak(): HasMany
+    public function pihakPerkara(): HasMany
     {
         return $this->hasMany(PihakPerkara::class, 'perkara_id');
     }
 
     public function penggugat(): HasMany
     {
-        return $this->pihak()->where('tipe', 'penggugat');
+        return $this->pihakPerkara()->where('tipe', 'penggugat');
     }
 
     public function tergugat(): HasMany
     {
-        return $this->pihak()->where('tipe', 'tergugat');
+        return $this->pihakPerkara()->where('tipe', 'tergugat');
     }
 
     public function jadwalSidang(): HasMany
