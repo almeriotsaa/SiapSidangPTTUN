@@ -126,9 +126,9 @@
     }
 
     .brand-sub-title {
-        font-size: 16px;
+        font-size: 18px;
         color: var(--gold);
-        font-weight: 500;
+        font-weight: 600;
     }
 
     .nav-link {

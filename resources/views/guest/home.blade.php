@@ -14,53 +14,54 @@
             <div class="col-lg-6">
 
                 <h1 class="title-hero">
-
                     SIAP SIDANG
-
                 </h1>
 
                 <h4 class="sub-title mb-3">
-
                     Pengadilan Tinggi Tata Usaha Negara Jakarta
-
                 </h4>
 
                 <p class="deskripsi">
-
                     Website resmi SIAP SIDANG Pengadilan Tinggi Tata Usaha Negara Jakarta.
-
-                    Masyarakat dapat melihat jadwal sidang secara online, sedangkan petugas internal dapat melakukan validasi kehadiran pihak yang berperkara.
-
+                    Masyarakat dapat melihat jadwal sidang secara online, sedangkan petugas
+                    internal dapat melakukan validasi kehadiran pihak yang berperkara.
                 </p>
+
+                {{-- Button Lihat Jadwal --}}
+                <a href="/jadwal"
+                   class="btn btn-jadwal mb-3 {{ request()->is('jadwal*') ? 'active' : '' }}">
+                    <i class="bi bi-calendar3 me-2"></i>
+                    Lihat Jadwal Sidang
+                </a>
 
             </div>
 
             <div class="col-lg-6 text-center">
 
                 <div id="heroCarousel"
-                    class="carousel slide hero-carousel"
-                    data-bs-ride="carousel"
-                    data-bs-interval="4000"
-                    data-bs-pause="false">
+                     class="carousel slide hero-carousel"
+                     data-bs-ride="carousel"
+                     data-bs-interval="4000"
+                     data-bs-pause="false">
 
                     <div class="carousel-inner">
 
                         <div class="carousel-item active">
                             <img src="{{ asset('assets/images/pttun 1.jfif') }}"
-                                class="d-block w-100 image-hero"
-                                alt="">
+                                 class="d-block w-100 image-hero"
+                                 alt="Pengadilan Tinggi Tata Usaha Negara Jakarta">
                         </div>
 
                         <div class="carousel-item">
                             <img src="{{ asset('assets/images/pttun 2.jfif') }}"
-                                class="d-block w-100 image-hero"
-                                alt="">
+                                 class="d-block w-100 image-hero"
+                                 alt="Pengadilan Tinggi Tata Usaha Negara Jakarta">
                         </div>
 
                         <div class="carousel-item">
                             <img src="{{ asset('assets/images/pttun 3.jfif') }}"
-                                class="d-block w-100 image-hero"
-                                alt="">
+                                 class="d-block w-100 image-hero"
+                                 alt="Pengadilan Tinggi Tata Usaha Negara Jakarta">
                         </div>
 
                     </div>
@@ -253,6 +254,33 @@
     .carousel-item.active img {
         transform: scale(1.05);
     }
+
+    .btn-jadwal {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 12px 24px;
+
+    background: #c9a227;
+    color: #ffffff;
+
+    border: none;
+    border-radius: 8px;
+
+    font-size: 16px;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition: all 0.25s ease;
+}
+
+.btn-jadwal:hover {
+    background: #b18c1f;
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
 
     /* ===== Fitur ===== */
     .fitur-section {
