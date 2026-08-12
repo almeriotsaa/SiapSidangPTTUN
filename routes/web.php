@@ -2,12 +2,23 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Guest\JadwalSidangController;
+use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Admin\HakimController;
+use App\Http\Controllers\Admin\PaniteraController;
+use App\Http\Controllers\Admin\PerkaraController;
+use App\Http\Controllers\Admin\JadwalSidangController as AdminJadwalSidangController;
+use App\Http\Controllers\Admin\KehadiranController;
+use App\Http\Controllers\Admin\RiwayatController;
+use App\Http\Controllers\Admin\DashboardController;
 
+// ============================
+// Halaman publik (tidak perlu login)
+// ============================
 Route::get('/', function () {
     return view('guest.home');
 });
 
-Route::get('/jadwal',[JadwalSidangController::class,'index']);
+Route::get('/jadwal', [JadwalSidangController::class, 'index']);
 
 Route::get('/kontak', function () {
     return view('guest.kontak');
@@ -17,55 +28,44 @@ Route::get('/tentang', function () {
     return view('guest.tentang');
 });
 
-Route::get('/login', function () {
-    return view('auth.login');
-});
+// ============================
+// Autentikasi
+// ============================
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login'])->name('login.attempt');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::get('/dashboard', function () {
-    return view('dashboard.dashboard');
-});
+// ============================
+// Halaman admin (WAJIB login)
+// ============================
+Route::middleware('auth')->group(function () {
 
-Route::get('/kelola-jadwal', function () {
-    $perkaraList = [
-        ['perkara' => '123/Pdt.G/2026/PN.Jkt.Ps', 'agenda' => 'Pembuktian Penggugat', 'penggugat' => 'Tajudin, DKK', 'tergugat' => 'Kepala Kantor Pertanahan Kabupaten Pandeglang'],
-        ['perkara' => '45/Pid.B/2026/PN.Jkt.Ps', 'agenda' => 'Pemeriksaan Saksi', 'penggugat' => 'JPU Kejari Jakarta Pusat', 'tergugat' => 'Ahmad Fauzi (Terdakwa)'],
-        ['perkara' => '78/Pdt.G/2026/PN.Jkt.Ps', 'agenda' => 'Mediasi', 'penggugat' => 'Ny. Ratna Wijaya', 'tergugat' => 'CV Karya Abadi'],
-    ];
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 
-    $hakimList = [
-        'Dr. H. Ahmad Sutrisno, S.H., M.H.',
-        'Hj. Rina Marlina, S.H., M.H.',
-        'Bambang Setiawan, S.H., M.H.',
-        'Drs. H. Slamet Riyadi, S.H., M.H.',
-        'Yuni Kartika, S.H., M.H.',
-        'Agus Salim, S.H., M.H.',
-    ];
+    Route::get('/kelola-jadwal', [AdminJadwalSidangController::class, 'index'])->name('kelola-jadwal.index');
+    Route::post('/kelola-jadwal', [AdminJadwalSidangController::class, 'store'])->name('kelola-jadwal.store');
+    Route::put('/kelola-jadwal/{jadwal}', [AdminJadwalSidangController::class, 'update'])->name('kelola-jadwal.update');
+    Route::delete('/kelola-jadwal/{jadwal}', [AdminJadwalSidangController::class, 'destroy'])->name('kelola-jadwal.destroy');
 
-    $paniteraList = [
-        'Siti Aminah, S.H.',
-        'Rudi Hartono, S.H.',
-        'Dewi Lestari, S.H.',
-    ];
+    Route::get('/riwayat', [RiwayatController::class, 'index'])->name('riwayat.index');
 
-    return view('jadwal.kelola', compact('perkaraList', 'hakimList', 'paniteraList'));
-});
+    Route::middleware('role:admin')->group(function () {
 
-Route::get('/riwayat', function () {
-    return view('jadwal.riwayat');
-});
+        Route::get('/perkara', [PerkaraController::class, 'index'])->name('perkara.index');
+        Route::post('/perkara', [PerkaraController::class, 'store'])->name('perkara.store');
+        Route::put('/perkara/{perkara}', [PerkaraController::class, 'update'])->name('perkara.update');
+        Route::delete('/perkara/{perkara}', [PerkaraController::class, 'destroy'])->name('perkara.destroy');
 
-Route::get('/perkara', function () {
-    return view('perkara.perkara');
-});
+        Route::get('/hakim', [HakimController::class, 'index'])->name('hakim.index');
+        Route::post('/hakim', [HakimController::class, 'store'])->name('hakim.store');
+        Route::delete('/hakim/{hakim}', [HakimController::class, 'destroy'])->name('hakim.destroy');
 
-Route::post('/logout', function () {
-    return redirect('/');
-})->name('logout');
+        Route::post('/panitera', [PaniteraController::class, 'store'])->name('panitera.store');
+        Route::delete('/panitera/{panitera}', [PaniteraController::class, 'destroy'])->name('panitera.destroy');
 
-Route::get('/hakim', function () {
-    return view('hakim.hakim');
-});
+    });
 
-Route::get('/kehadiran', function () {
-    return view('kehadiran.kehadiran');
+    Route::get('/kehadiran', [KehadiranController::class, 'index'])->name('kehadiran.index');
+    Route::post('/kehadiran/{kehadiran}/tandai-hadir', [KehadiranController::class, 'tandaiHadir'])->name('kehadiran.tandai-hadir');
+
 });

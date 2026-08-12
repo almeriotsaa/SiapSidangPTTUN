@@ -8,5 +8,12 @@ class Hakim extends Model
 {
     protected $table = 'hakim';
 
-    protected $guarded = [];
+    protected $fillable = [
+        'nama',
+        'aktif',
+    ];
+
+    protected $casts = [
+        'aktif' => 'boolean',
+    ];
 }

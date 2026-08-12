@@ -42,6 +42,22 @@
                     </a>
                 </li>
 
+                @if (auth()->user()->role === 'admin')
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->is('perkara*') ? 'active' : '' }}"
+                            href="/perkara">
+                            Perkara
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->is('hakim*') ? 'active' : '' }}"
+                            href="/hakim">
+                            Majelis Hakim/PP
+                        </a>
+                    </li>
+                @endif
+
                 <li class="nav-item">
                     <a class="nav-link {{ request()->is('kelola*') ? 'active' : '' }}"
                         href="/kelola-jadwal">
@@ -64,13 +80,11 @@
                 </li>
 
                 <li class="nav-item ms-lg-2">
-                    <form method="POST" action="{{ route('logout') }}" class="d-inline">
-                        @csrf
-                        <button type="submit" class="btn-keanggotaan">
-                            <i class="bi bi-box-arrow-right me-2"></i>
-                            Log out
-                        </button>
-                    </form>
+                    <button type="button" class="btn-keanggotaan btn-logout-danger"
+                        data-bs-toggle="modal" data-bs-target="#logoutConfirmModal">
+                        <i class="bi bi-box-arrow-right me-2"></i>
+                        Log out
+                    </button>
                 </li>
 
             </ul>
@@ -155,6 +169,15 @@
         color: var(--gold);
     }
 
+    .btn-logout-danger {
+        color: #dc2626;
+    }
+
+    .btn-logout-danger:hover {
+        background: #fef2f2;
+        color: #b91c1c;
+    }
+
     .dropdown-menu {
         margin-top: 12px;
         border: none;
@@ -202,3 +225,28 @@
 
     }
 </style>
+
+{{-- Modal Konfirmasi Logout --}}
+<div class="modal fade" id="logoutConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4">
+            <div class="modal-body text-center pt-4 pb-2">
+                <p class="fw-bold text-dark mb-1">Keluar dari akun?</p>
+                <p class="text-secondary small mb-0">
+                    Apakah Anda yakin ingin keluar dari halaman ini?
+                </p>
+            </div>
+            <div class="modal-footer border-0 justify-content-center gap-2 pb-4">
+                <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
+                    Kembali
+                </button>
+                <form method="POST" action="{{ route('logout') }}" class="d-inline m-0">
+                    @csrf
+                    <button type="submit" class="btn btn-danger px-4">
+                        Keluar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

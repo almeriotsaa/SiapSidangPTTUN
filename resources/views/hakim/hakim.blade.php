@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title','Kelola Majelis Hakim')
+@section('title','Kelola Majelis Hakim & Panitera Pengganti')
 
 @section('content')
 
@@ -53,81 +53,183 @@
         justify-content:center;
         border-radius:.5rem;
     }
+
+    .section-title {
+        font-size:.72rem;
+        font-weight:700;
+        color:#6b7280;
+        text-transform:uppercase;
+        letter-spacing:.03em;
+    }
+
+    .table-scroll-wrap {
+        max-height: 360px;
+        overflow-y: auto;
+    }
+    .table-scroll-wrap thead th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
 </style>
 
 <section class="py-5">
     <div class="page-container">
 
         {{-- Header --}}
-        <div class="d-flex align-items-start justify-content-between mb-4 flex-wrap gap-2">
-            <div>
-                <h1 class="h3 fw-bold text-dark mb-1">Kelola Majelis Hakim</h1>
-                <p class="text-secondary small mb-0">
-                    Tambah atau hapus nama hakim &middot; Data ini masih dummy (belum tersambung database)
-                </p>
+        <div class="mb-4">
+            <h1 class="h3 fw-bold text-dark mb-1">Kelola Majelis Hakim &amp; Panitera Pengganti</h1>
+            <p class="text-secondary small mb-0">
+                Data ini dipakai saat membuat jadwal sidang
+            </p>
+        </div>
+
+        @if (session('success'))
+            <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
+        @if (session('error'))
+            <div class="alert alert-danger">{{ session('error') }}</div>
+        @endif
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
             </div>
-            <button type="button" onclick="openModal()"
-                class="btn btn-primary d-flex align-items-center gap-2">
-                <span class="fs-5 lh-1">+</span> Tambah Hakim
-            </button>
+        @endif
+
+        {{-- ============================= --}}
+        {{-- SECTION: Majelis Hakim         --}}
+        {{-- ============================= --}}
+        <div class="mb-5">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <p class="section-title mb-0">Majelis Hakim</p>
+                <button type="button" onclick="openHakimModal()"
+                    class="btn btn-primary btn-sm d-flex align-items-center gap-1">
+                    <span class="fs-6 lh-1">+</span> Tambah Hakim
+                </button>
+            </div>
+
+            <div class="table-card">
+                <div class="table-scroll-wrap">
+                    <table class="table table-borderless mb-0">
+                        <thead>
+                            <tr>
+                                <th class="px-3 py-3">No</th>
+                                <th class="px-3 py-3">Nama Hakim</th>
+                                <th class="px-3 py-3 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($hakimList as $i => $h)
+                                <tr style="border-top:1px solid #f1f1f1;">
+                                    <td class="px-3 py-3 text-secondary">{{ $i + 1 }}</td>
+                                    <td class="px-3 py-3 fw-semibold text-dark">{{ $h->nama }}</td>
+                                    <td class="px-3 py-3 text-center">
+                                        <form id="deleteHakimForm{{ $h->id }}" method="POST" action="{{ route('hakim.destroy', $h->id) }}" class="d-none">
+                                            @csrf
+                                            @method('DELETE')
+                                        </form>
+                                        <button type="button" class="btn btn-link btn-sm text-decoration-none text-danger p-0"
+                                            onclick="askDelete('deleteHakimForm{{ $h->id }}', 'Yakin ingin menghapus {{ $h->nama }}?')">
+                                            Hapus
+                                        </button>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="3" class="text-center text-secondary small py-4">
+                                        Belum ada data hakim.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
 
-        {{-- Table --}}
-        <div class="table-card">
-            <table class="table table-borderless mb-0">
-                <thead>
-                    <tr>
-                        <th class="px-3 py-3">No</th>
-                        <th class="px-3 py-3">Nama Hakim</th>
-                        <th class="px-3 py-3 text-center">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody">
-                    {{-- Diisi otomatis oleh JavaScript --}}
-                </tbody>
-            </table>
-        </div>
+        {{-- ============================= --}}
+        {{-- SECTION: Panitera Pengganti    --}}
+        {{-- ============================= --}}
+        <div>
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <p class="section-title mb-0">Panitera Pengganti</p>
+                <button type="button" onclick="openPaniteraModal()"
+                    class="btn btn-primary btn-sm d-flex align-items-center gap-1">
+                    <span class="fs-6 lh-1">+</span> Tambah Panitera
+                </button>
+            </div>
 
-        <p id="emptyState" class="d-none text-center text-secondary small py-5">
-            Belum ada data hakim. Klik "Tambah Hakim" untuk menambahkan.
-        </p>
+            <div class="table-card">
+                <div class="table-scroll-wrap">
+                    <table class="table table-borderless mb-0">
+                        <thead>
+                            <tr>
+                                <th class="px-3 py-3">No</th>
+                                <th class="px-3 py-3">Nama Panitera Pengganti</th>
+                                <th class="px-3 py-3 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($paniteraList as $i => $p)
+                                <tr style="border-top:1px solid #f1f1f1;">
+                                    <td class="px-3 py-3 text-secondary">{{ $i + 1 }}</td>
+                                    <td class="px-3 py-3 fw-semibold text-dark">{{ $p->nama }}</td>
+                                    <td class="px-3 py-3 text-center">
+                                        <form id="deletePaniteraForm{{ $p->id }}" method="POST" action="{{ route('panitera.destroy', $p->id) }}" class="d-none">
+                                            @csrf
+                                            @method('DELETE')
+                                        </form>
+                                        <button type="button" class="btn btn-link btn-sm text-decoration-none text-danger p-0"
+                                            onclick="askDelete('deletePaniteraForm{{ $p->id }}', 'Yakin ingin menghapus {{ $p->nama }}?')">
+                                            Hapus
+                                        </button>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="3" class="text-center text-secondary small py-4">
+                                        Belum ada data panitera pengganti.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
     </div>
 </section>
 
-{{-- Modal Form Hakim --}}
+{{-- Modal Tambah Hakim --}}
 <div class="modal fade" id="hakimModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content rounded-4">
             <div class="modal-header border-0 pb-0">
                 <h2 class="h5 fw-bold text-dark mb-0">Tambah Hakim</h2>
-                <button type="button" class="btn-close" onclick="closeModal()" aria-label="Close"></button>
+                <button type="button" class="btn-close" onclick="closeHakimModal()" aria-label="Close"></button>
             </div>
-
             <div class="modal-body">
-                <form id="hakimForm" onsubmit="saveHakim(event)">
-
+                <form method="POST" action="{{ route('hakim.store') }}">
+                    @csrf
                     <label class="form-label fw-semibold small text-dark">Nama Hakim</label>
-                    <div id="nameFieldsWrapper">
-                        {{-- Baris nama pertama, tidak bisa dihapus --}}
+                    <div id="hakimNameFieldsWrapper">
                         <div class="name-row">
-                            <input type="text" class="form-control hakim-name-input" required
+                            <input type="text" name="names[]" class="form-control" required
                                 placeholder="Dr. H. Ahmad Sutrisno, S.H., M.H.">
                         </div>
                     </div>
-
-                    <button type="button" onclick="addNameField()"
+                    <button type="button" onclick="addNameField('hakimNameFieldsWrapper', 'Nama hakim lainnya')"
                         class="btn btn-outline-primary btn-sm d-flex align-items-center gap-1 mb-3">
                         <span class="fs-6 lh-1">+</span> Tambah Nama Lain
                     </button>
-
                     <div class="d-flex gap-3 pt-2 border-top">
-                        <button type="button" onclick="closeModal()" class="btn btn-outline-secondary flex-fill mt-3">
-                            Batal
-                        </button>
-                        <button type="submit" class="btn btn-primary flex-fill mt-3">
-                            Simpan
-                        </button>
+                        <button type="button" onclick="closeHakimModal()" class="btn btn-outline-secondary flex-fill mt-3">Batal</button>
+                        <button type="submit" class="btn btn-primary flex-fill mt-3">Simpan</button>
                     </div>
                 </form>
             </div>
@@ -135,103 +237,96 @@
     </div>
 </div>
 
-<script>
-    // ============================================
-    // DUMMY DATA — belum tersambung database.
-    // Struktur ini murni untuk preview UI, belum ada validasi server-side,
-    // belum ada CSRF protection, dan tidak persist setelah refresh.
-    // ============================================
-    let hakimData = [
-        'Dr. H. Ahmad Sutrisno, S.H., M.H.',
-        'Hj. Rina Marlina, S.H., M.H.',
-        'Bambang Setiawan, S.H., M.H.',
-    ];
+{{-- Modal Tambah Panitera --}}
+<div class="modal fade" id="paniteraModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h2 class="h5 fw-bold text-dark mb-0">Tambah Panitera Pengganti</h2>
+                <button type="button" class="btn-close" onclick="closePaniteraModal()" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{{ route('panitera.store') }}">
+                    @csrf
+                    <label class="form-label fw-semibold small text-dark">Nama Panitera Pengganti</label>
+                    <div id="paniteraNameFieldsWrapper">
+                        <div class="name-row">
+                            <input type="text" name="names[]" class="form-control" required
+                                placeholder="Siti Aminah, S.H.">
+                        </div>
+                    </div>
+                    <button type="button" onclick="addNameField('paniteraNameFieldsWrapper', 'Nama panitera lainnya')"
+                        class="btn btn-outline-primary btn-sm d-flex align-items-center gap-1 mb-3">
+                        <span class="fs-6 lh-1">+</span> Tambah Nama Lain
+                    </button>
+                    <div class="d-flex gap-3 pt-2 border-top">
+                        <button type="button" onclick="closePaniteraModal()" class="btn btn-outline-secondary flex-fill mt-3">Batal</button>
+                        <button type="submit" class="btn btn-primary flex-fill mt-3">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
+{{-- Modal Konfirmasi Hapus (dipakai bersama untuk Hakim & Panitera) --}}
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4">
+            <div class="modal-body text-center pt-4 pb-2">
+                <p class="fw-bold text-dark mb-1">Hapus data ini?</p>
+                <p id="deleteConfirmText" class="text-secondary small mb-0">Apakah Anda yakin ingin menghapus data ini?</p>
+            </div>
+            <div class="modal-footer border-0 justify-content-center gap-2 pb-4">
+                <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-danger px-4" onclick="confirmDeleteSubmit()">Hapus</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
     let hakimModalInstance = null;
+    let paniteraModalInstance = null;
+    let deleteModalInstance = null;
+    let formToDelete = null;
+
     document.addEventListener('DOMContentLoaded', function () {
         hakimModalInstance = new bootstrap.Modal(document.getElementById('hakimModal'));
+        paniteraModalInstance = new bootstrap.Modal(document.getElementById('paniteraModal'));
+        deleteModalInstance = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
     });
 
-    function renderTable() {
-        const tbody = document.getElementById('tableBody');
-        const emptyState = document.getElementById('emptyState');
-        tbody.innerHTML = '';
-
-        if (hakimData.length === 0) {
-            emptyState.classList.remove('d-none');
-            return;
-        }
-        emptyState.classList.add('d-none');
-
-        hakimData.forEach((nama, i) => {
-            const row = document.createElement('tr');
-            row.style.borderTop = '1px solid #f1f1f1';
-            row.innerHTML = `
-                <td class="px-3 py-3 text-secondary">${i + 1}</td>
-                <td class="px-3 py-3 fw-semibold text-dark">${nama}</td>
-                <td class="px-3 py-3 text-center">
-                    <button onclick="deleteHakim(${i})" class="btn btn-link btn-sm text-decoration-none text-danger p-0">Hapus</button>
-                </td>
-            `;
-            tbody.appendChild(row);
-        });
-    }
-
-    // Tambah satu baris input nama baru, dengan tombol hapus baris (kecuali baris pertama)
-    function addNameField() {
-        const wrapper = document.getElementById('nameFieldsWrapper');
-
+    // Dipakai untuk kedua form (Hakim & Panitera) — wrapper ID beda per form
+    function addNameField(wrapperId, placeholderText) {
+        const wrapper = document.getElementById(wrapperId);
         const row = document.createElement('div');
         row.className = 'name-row';
         row.innerHTML = `
-            <input type="text" class="form-control hakim-name-input" required
-                placeholder="Nama hakim lainnya">
-            <button type="button" class="btn btn-outline-danger btn-remove-name" onclick="this.parentElement.remove()">
-                &times;
-            </button>
+            <input type="text" name="names[]" class="form-control" required placeholder="${placeholderText}">
+            <button type="button" class="btn btn-outline-danger btn-remove-name" onclick="this.parentElement.remove()">&times;</button>
         `;
         wrapper.appendChild(row);
     }
 
-    function openModal() {
-        document.getElementById('hakimForm').reset();
-        // Reset ke satu input kosong saja setiap kali modal dibuka
-        document.getElementById('nameFieldsWrapper').innerHTML = `
-            <div class="name-row">
-                <input type="text" class="form-control hakim-name-input" required
-                    placeholder="Dr. H. Ahmad Sutrisno, S.H., M.H.">
-            </div>
-        `;
-        hakimModalInstance.show();
+    function openHakimModal() { hakimModalInstance.show(); }
+    function closeHakimModal() { hakimModalInstance.hide(); }
+
+    function openPaniteraModal() { paniteraModalInstance.show(); }
+    function closePaniteraModal() { paniteraModalInstance.hide(); }
+
+    // Buka modal konfirmasi, simpan form mana yang harus disubmit kalau user klik "Hapus"
+    function askDelete(formId, message) {
+        formToDelete = document.getElementById(formId);
+        document.getElementById('deleteConfirmText').textContent = message;
+        deleteModalInstance.show();
     }
 
-    function deleteHakim(index) {
-        if (confirm('Yakin ingin menghapus nama hakim ini?')) {
-            hakimData.splice(index, 1);
-            renderTable();
+    function confirmDeleteSubmit() {
+        if (formToDelete) {
+            formToDelete.submit();
         }
     }
-
-    function closeModal() {
-        hakimModalInstance.hide();
-    }
-
-    function saveHakim(event) {
-        event.preventDefault();
-
-        const inputs = document.querySelectorAll('.hakim-name-input');
-        inputs.forEach(input => {
-            const nama = input.value.trim();
-            if (nama !== '') {
-                hakimData.push(nama);
-            }
-        });
-
-        renderTable();
-        closeModal();
-    }
-
-    renderTable();
 </script>
 
 @endsection

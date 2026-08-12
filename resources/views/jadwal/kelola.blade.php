@@ -55,6 +55,17 @@
         color:#9ca3af;
         font-style:italic;
     }
+
+    .pihak-pill {
+        display:inline-block;
+        background:#f3f4f6;
+        color:#374151;
+        border-radius:.4rem;
+        padding:2px 8px;
+        font-size:.8rem;
+        margin:2px 4px 2px 0;
+        white-space:normal;
+    }
 </style>
 
 <section class="hero-section py-5">
@@ -65,14 +76,29 @@
         <div>
             <h1 class="h3 fw-bold text-dark mb-1">Kelola Jadwal Sidang</h1>
             <p class="text-secondary small mb-0">
-                Tambah, ubah, atau hapus jadwal sidang &middot; Data ini masih dummy (belum tersambung database)
+                Tambah, ubah, atau hapus jadwal sidang
             </p>
         </div>
-        <button onclick="openModal()" type="button"
-            class="btn btn-primary d-flex align-items-center gap-2">
-            <span class="fs-5 lh-1">+</span> Tambah Jadwal
-        </button>
+        @if (auth()->user()->role === 'admin')
+            <button onclick="openAddModal()" type="button"
+                class="btn btn-primary d-flex align-items-center gap-2">
+                <span class="fs-5 lh-1">+</span> Tambah Jadwal
+            </button>
+        @endif
     </div>
+
+    @if (session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
     {{-- Table --}}
     <div class="table-card table-responsive-wrap">
@@ -91,327 +117,407 @@
                     <th class="px-3 py-3">Panitera Pengganti</th>
                     <th class="px-3 py-3">Penggugat</th>
                     <th class="px-3 py-3">Tergugat</th>
-                    <th class="px-3 py-3 text-center">Aksi</th>
+                    @if (auth()->user()->role === 'admin')
+                        <th class="px-3 py-3 text-center">Aksi</th>
+                    @endif
                 </tr>
             </thead>
-            <tbody id="tableBody">
-                {{-- Diisi otomatis oleh JavaScript --}}
+            <tbody>
+                @forelse ($jadwalList as $i => $j)
+                    <tr style="border-top:1px solid #f1f1f1;">
+                        <td class="px-3 py-3 text-secondary">{{ $i + 1 }}</td>
+                        <td class="px-3 py-3 fw-semibold text-dark">{{ $j->perkara->nomor_perkara }}</td>
+                        <td class="px-3 py-3">{{ $j->perkara->agenda }}</td>
+                        <td class="px-3 py-3">{{ $j->tanggal_sidang->format('d M Y') }}</td>
+                        <td class="px-3 py-3 fw-medium">{{ substr($j->jam_sidang, 0, 5) }}</td>
+                        <td class="px-3 py-3">{{ $j->ruang_sidang }}</td>
+                        <td class="px-3 py-3">{{ $j->hakimKetua->nama }}</td>
+                        <td class="px-3 py-3">{{ $j->hakimAnggota1->nama }}</td>
+                        <td class="px-3 py-3">{{ $j->hakimAnggota2->nama }}</td>
+                        <td class="px-3 py-3">{{ $j->panitera->nama }}</td>
+                        <td class="px-3 py-3">
+                            @foreach ($j->perkara->pihak->where('tipe', 'penggugat') as $pg)
+                                <span class="pihak-pill">{{ $pg->nama }}</span>
+                            @endforeach
+                        </td>
+                        <td class="px-3 py-3">
+                            @foreach ($j->perkara->pihak->where('tipe', 'tergugat') as $tg)
+                                <span class="pihak-pill">{{ $tg->nama }}</span>
+                            @endforeach
+                        </td>
+                        @if (auth()->user()->role === 'admin')
+                            <td class="px-3 py-3 text-center">
+                                <button type="button" class="btn btn-link btn-sm text-decoration-none p-0 me-3"
+                                    onclick="openEditModal({{ $j->id }})">Edit</button>
+
+                                <form id="deleteJadwalForm{{ $j->id }}" method="POST" action="{{ route('kelola-jadwal.destroy', $j->id) }}" class="d-none">
+                                    @csrf
+                                    @method('DELETE')
+                                </form>
+                                <button type="button" class="btn btn-link btn-sm text-decoration-none text-danger p-0"
+                                    onclick="askDelete('deleteJadwalForm{{ $j->id }}', 'Yakin ingin menghapus jadwal sidang {{ $j->perkara->nomor_perkara }} tanggal {{ $j->tanggal_sidang->format('d M Y') }}?')">
+                                    Hapus
+                                </button>
+                            </td>
+                        @endif
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="13" class="text-center text-secondary small py-5">
+                            Belum ada jadwal sidang.
+                        </td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
 
-    <p id="emptyState" class="d-none text-center text-secondary small py-5">
-        Belum ada jadwal sidang. Klik "Tambah Jadwal" untuk menambahkan.
-    </p>
-
 </div>
 
-{{-- Modal --}}
-<div class="modal fade" id="modalOverlay" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content rounded-4">
-            <div class="modal-header border-0 pb-0">
-                <h2 id="modalTitle" class="h5 fw-bold text-dark mb-0">Tambah Jadwal Sidang</h2>
-                <button type="button" class="btn-close" onclick="closeModal()" aria-label="Close"></button>
-            </div>
+@if (auth()->user()->role === 'admin')
 
-            <div class="modal-body">
-                <form id="jadwalForm" onsubmit="saveJadwal(event)">
-                    <input type="hidden" id="editIndex" value="">
+    {{-- Modal Tambah Jadwal --}}
+    <div class="modal fade" id="addJadwalModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content rounded-4">
+                <div class="modal-header border-0 pb-0">
+                    <h2 class="h5 fw-bold text-dark mb-0">Tambah Jadwal Sidang</h2>
+                    <button type="button" class="btn-close" onclick="closeAddModal()" aria-label="Close"></button>
+                </div>
 
-                    {{-- No. Perkara: dropdown, memicu autofill --}}
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold small text-dark">No. Perkara</label>
-                        <select id="f_perkara" required class="form-select" onchange="handlePerkaraChange()">
-                            <option value="" disabled selected>Pilih No. Perkara</option>
-                            @foreach ($perkaraList as $p)
-                                <option value="{{ $p['perkara'] }}">{{ $p['perkara'] }}</option>
-                            @endforeach
-                        </select>
-                    </div>
+                <div class="modal-body">
+                    <form method="POST" action="{{ route('kelola-jadwal.store') }}">
+                        @csrf
 
-                    {{-- Auto-terisi dari data Perkara, tidak bisa diedit manual --}}
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold small text-dark">Penggugat</label>
-                            <div id="f_penggugat_display" class="autofill-box is-empty">Pilih No. Perkara dulu</div>
-                            <input type="hidden" id="f_penggugat">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold small text-dark">Tergugat</label>
-                            <div id="f_tergugat_display" class="autofill-box is-empty">Pilih No. Perkara dulu</div>
-                            <input type="hidden" id="f_tergugat">
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold small text-dark">Agenda</label>
-                        <div id="f_agenda_display" class="autofill-box is-empty">Pilih No. Perkara dulu</div>
-                        <input type="hidden" id="f_agenda">
-                    </div>
-
-                    <div class="pt-2 border-top mb-3">
-                        <p class="text-secondary fw-bold text-uppercase mb-0 mt-3" style="font-size:.72rem; letter-spacing:.03em;">
-                            Jadwal
-                        </p>
-                    </div>
-
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-4">
-                            <label class="form-label fw-semibold small text-dark">Tanggal Sidang</label>
-                            <input id="f_tanggal" type="date" required class="form-control">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-semibold small text-dark">Jam Sidang</label>
-                            <input id="f_waktu" type="time" required class="form-control">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-semibold small text-dark">Ruang Sidang</label>
-                            <select id="f_ruang" required class="form-select">
-                                <option value="" disabled selected>Pilih Ruang</option>
-                                <option>Ruang Sidang Persiapan</option>
-                                <option>Ruang Sidang I</option>
-                                <option>Ruang Sidang II</option>
-                                <option>Ruang Sidang III</option>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small text-dark">No. Perkara</label>
+                            <select name="perkara_id" id="f_perkara_add" required class="form-select" onchange="handlePerkaraChange('add')">
+                                <option value="" disabled selected>Pilih No. Perkara</option>
+                                @foreach ($perkaraList as $p)
+                                    <option value="{{ $p->id }}">{{ $p->nomor_perkara }}</option>
+                                @endforeach
                             </select>
                         </div>
-                    </div>
 
-                    <div class="pt-2 border-top mb-3">
-                        <p class="text-secondary fw-bold text-uppercase mb-0 mt-3" style="font-size:.72rem; letter-spacing:.03em;">
-                            Majelis Hakim &amp; Panitera Pengganti
-                        </p>
-                    </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold small text-dark">Penggugat</label>
+                                <div id="f_penggugat_display_add" class="autofill-box is-empty">Pilih No. Perkara dulu</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold small text-dark">Tergugat</label>
+                                <div id="f_tergugat_display_add" class="autofill-box is-empty">Pilih No. Perkara dulu</div>
+                            </div>
+                        </div>
 
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold small text-dark">Hakim Ketua</label>
-                        <select id="f_hakim_ketua" required class="form-select">
-                            <option value="" disabled selected>Pilih Hakim Ketua</option>
-                            @foreach ($hakimList as $h)
-                                <option value="{{ $h }}">{{ $h }}</option>
-                            @endforeach
-                        </select>
-                    </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small text-dark">Agenda</label>
+                            <div id="f_agenda_display_add" class="autofill-box is-empty">Pilih No. Perkara dulu</div>
+                        </div>
 
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold small text-dark">Hakim Anggota I</label>
-                        <select id="f_hakim_1" required class="form-select">
-                            <option value="" disabled selected>Pilih Hakim Anggota I</option>
-                            @foreach ($hakimList as $h)
-                                <option value="{{ $h }}">{{ $h }}</option>
-                            @endforeach
-                        </select>
-                    </div>
+                        <div class="pt-2 border-top mb-3">
+                            <p class="text-secondary fw-bold text-uppercase mb-0 mt-3" style="font-size:.72rem; letter-spacing:.03em;">Jadwal</p>
+                        </div>
 
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold small text-dark">Hakim Anggota II</label>
-                        <select id="f_hakim_2" required class="form-select">
-                            <option value="" disabled selected>Pilih Hakim Anggota II</option>
-                            @foreach ($hakimList as $h)
-                                <option value="{{ $h }}">{{ $h }}</option>
-                            @endforeach
-                        </select>
-                    </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold small text-dark">Tanggal Sidang</label>
+                                <input type="date" name="tanggal_sidang" required class="form-control">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold small text-dark">Jam Sidang</label>
+                                <input type="time" name="jam_sidang" required class="form-control">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold small text-dark">Ruang Sidang</label>
+                                <select name="ruang_sidang" required class="form-select">
+                                    <option value="" disabled selected>Pilih Ruang</option>
+                                    <option>Ruang Sidang Persiapan</option>
+                                    <option>Ruang Sidang I</option>
+                                    <option>Ruang Sidang II</option>
+                                    <option>Ruang Sidang III</option>
+                                </select>
+                            </div>
+                        </div>
 
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold small text-dark">Panitera Pengganti</label>
-                        <select id="f_panitera" required class="form-select">
-                            <option value="" disabled selected>Pilih Panitera Pengganti</option>
-                            @foreach ($paniteraList as $pp)
-                                <option value="{{ $pp }}">{{ $pp }}</option>
-                            @endforeach
-                        </select>
-                    </div>
+                        <div class="pt-2 border-top mb-3">
+                            <p class="text-secondary fw-bold text-uppercase mb-0 mt-3" style="font-size:.72rem; letter-spacing:.03em;">Majelis Hakim &amp; Panitera Pengganti</p>
+                        </div>
 
-                    <div class="d-flex gap-3 pt-2 border-top">
-                        <button type="button" onclick="closeModal()" class="btn btn-outline-secondary flex-fill mt-3">
-                            Batal
-                        </button>
-                        <button type="submit" class="btn btn-primary flex-fill mt-3">
-                            Simpan
-                        </button>
-                    </div>
-                </form>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small text-dark">Hakim Ketua</label>
+                            <select name="hakim_ketua_id" required class="form-select">
+                                <option value="" disabled selected>Pilih Hakim Ketua</option>
+                                @foreach ($hakimList as $h)
+                                    <option value="{{ $h->id }}">{{ $h->nama }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small text-dark">Hakim Anggota I</label>
+                            <select name="hakim_anggota1_id" required class="form-select">
+                                <option value="" disabled selected>Pilih Hakim Anggota I</option>
+                                @foreach ($hakimList as $h)
+                                    <option value="{{ $h->id }}">{{ $h->nama }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small text-dark">Hakim Anggota II</label>
+                            <select name="hakim_anggota2_id" required class="form-select">
+                                <option value="" disabled selected>Pilih Hakim Anggota II</option>
+                                @foreach ($hakimList as $h)
+                                    <option value="{{ $h->id }}">{{ $h->nama }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small text-dark">Panitera Pengganti</label>
+                            <select name="panitera_pengganti_id" required class="form-select">
+                                <option value="" disabled selected>Pilih Panitera Pengganti</option>
+                                @foreach ($paniteraList as $pp)
+                                    <option value="{{ $pp->id }}">{{ $pp->nama }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="d-flex gap-3 pt-2 border-top">
+                            <button type="button" onclick="closeAddModal()" class="btn btn-outline-secondary flex-fill mt-3">Batal</button>
+                            <button type="submit" class="btn btn-primary flex-fill mt-3">Simpan</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
+
+    {{-- Modal Edit Jadwal — satu per baris, pre-filled dari server --}}
+    @foreach ($jadwalList as $j)
+        <div class="modal fade" id="editJadwalModal{{ $j->id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content rounded-4">
+                    <div class="modal-header border-0 pb-0">
+                        <h2 class="h5 fw-bold text-dark mb-0">Edit Jadwal Sidang</h2>
+                        <button type="button" class="btn-close" onclick="closeEditModal({{ $j->id }})" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <form method="POST" action="{{ route('kelola-jadwal.update', $j->id) }}">
+                            @csrf
+                            @method('PUT')
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold small text-dark">No. Perkara</label>
+                                <select name="perkara_id" id="f_perkara_edit{{ $j->id }}" required class="form-select" onchange="handlePerkaraChange('edit{{ $j->id }}')">
+                                    @foreach ($perkaraList as $p)
+                                        <option value="{{ $p->id }}" {{ $p->id === $j->perkara_id ? 'selected' : '' }}>{{ $p->nomor_perkara }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold small text-dark">Penggugat</label>
+                                    <div id="f_penggugat_display_edit{{ $j->id }}" class="autofill-box">-</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold small text-dark">Tergugat</label>
+                                    <div id="f_tergugat_display_edit{{ $j->id }}" class="autofill-box">-</div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold small text-dark">Agenda</label>
+                                <div id="f_agenda_display_edit{{ $j->id }}" class="autofill-box">-</div>
+                            </div>
+
+                            <div class="pt-2 border-top mb-3">
+                                <p class="text-secondary fw-bold text-uppercase mb-0 mt-3" style="font-size:.72rem; letter-spacing:.03em;">Jadwal</p>
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold small text-dark">Tanggal Sidang</label>
+                                    <input type="date" name="tanggal_sidang" required class="form-control"
+                                        value="{{ $j->tanggal_sidang->format('Y-m-d') }}">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold small text-dark">Jam Sidang</label>
+                                    <input type="time" name="jam_sidang" required class="form-control"
+                                        value="{{ substr($j->jam_sidang, 0, 5) }}">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold small text-dark">Ruang Sidang</label>
+                                    <select name="ruang_sidang" required class="form-select">
+                                        @foreach (['Ruang Sidang Persiapan', 'Ruang Sidang I', 'Ruang Sidang II', 'Ruang Sidang III'] as $ruang)
+                                            <option {{ $j->ruang_sidang === $ruang ? 'selected' : '' }}>{{ $ruang }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="pt-2 border-top mb-3">
+                                <p class="text-secondary fw-bold text-uppercase mb-0 mt-3" style="font-size:.72rem; letter-spacing:.03em;">Majelis Hakim &amp; Panitera Pengganti</p>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold small text-dark">Hakim Ketua</label>
+                                <select name="hakim_ketua_id" required class="form-select">
+                                    @foreach ($hakimList as $h)
+                                        <option value="{{ $h->id }}" {{ $h->id === $j->hakim_ketua_id ? 'selected' : '' }}>{{ $h->nama }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold small text-dark">Hakim Anggota I</label>
+                                <select name="hakim_anggota1_id" required class="form-select">
+                                    @foreach ($hakimList as $h)
+                                        <option value="{{ $h->id }}" {{ $h->id === $j->hakim_anggota1_id ? 'selected' : '' }}>{{ $h->nama }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold small text-dark">Hakim Anggota II</label>
+                                <select name="hakim_anggota2_id" required class="form-select">
+                                    @foreach ($hakimList as $h)
+                                        <option value="{{ $h->id }}" {{ $h->id === $j->hakim_anggota2_id ? 'selected' : '' }}>{{ $h->nama }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold small text-dark">Panitera Pengganti</label>
+                                <select name="panitera_pengganti_id" required class="form-select">
+                                    @foreach ($paniteraList as $pp)
+                                        <option value="{{ $pp->id }}" {{ $pp->id === $j->panitera_pengganti_id ? 'selected' : '' }}>{{ $pp->nama }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="d-flex gap-3 pt-2 border-top">
+                                <button type="button" onclick="closeEditModal({{ $j->id }})" class="btn btn-outline-secondary flex-fill mt-3">Batal</button>
+                                <button type="submit" class="btn btn-primary flex-fill mt-3">Simpan Perubahan</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endforeach
+
+    {{-- Modal Konfirmasi Hapus --}}
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4">
+                <div class="modal-body text-center pt-4 pb-2">
+                    <p class="fw-bold text-dark mb-1">Hapus jadwal ini?</p>
+                    <p id="deleteConfirmText" class="text-secondary small mb-0">Apakah Anda yakin ingin menghapus data ini?</p>
+                </div>
+                <div class="modal-footer border-0 justify-content-center gap-2 pb-4">
+                    <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-danger px-4" onclick="confirmDeleteSubmit()">Hapus</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+@endif
+
 </section>
 
-
 <script>
-    // ============================================
-    // DUMMY DATA — belum tersambung database.
-    // perkaraOptions ditulis ulang dari data Blade ($perkaraList) supaya bisa
-    // dipakai untuk logic autofill JavaScript.
-    // Status kehadiran Penggugat/Tergugat TIDAK ditangani di halaman ini —
-    // itu tanggung jawab fitur Kehadiran/Check-in yang terpisah.
-    // ============================================
-    const perkaraOptions = @json($perkaraList);
+    @if (auth()->user()->role === 'admin')
+        // Data perkara lengkap (termasuk pihak/penggugat/tergugat & agenda) untuk logic autofill JS
+        const perkaraOptions = @json($perkaraList);
 
-    let jadwalData = [
-        {
-            perkara: '123/Pdt.G/2026/PN.Jkt.Ps', agenda: 'Pembuktian Penggugat',
-            tanggal: '2026-08-04', waktu: '08.30', ruang: 'Ruang Sidang I',
-            hakim_ketua: 'Dr. H. Ahmad Sutrisno, S.H., M.H.', hakim_1: 'Hj. Rina Marlina, S.H., M.H.', hakim_2: 'Bambang Setiawan, S.H., M.H.',
-            panitera: 'Siti Aminah, S.H.',
-            penggugat: 'Budi Santoso',
-            tergugat: 'PT Sumber Makmur',
-        },
-    ];
+        let addModalInstance = null;
+        const editModalInstances = {};
+        let deleteModalInstance = null;
+        let formToDelete = null;
 
-    let jadwalModalInstance = null;
-    document.addEventListener('DOMContentLoaded', function () {
-        jadwalModalInstance = new bootstrap.Modal(document.getElementById('modalOverlay'));
-    });
+        document.addEventListener('DOMContentLoaded', function () {
+            addModalInstance = new bootstrap.Modal(document.getElementById('addJadwalModal'));
+            deleteModalInstance = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
 
-    // Saat No. Perkara dipilih, isi otomatis Penggugat / Tergugat / Agenda
-    function handlePerkaraChange() {
-        const selected = document.getElementById('f_perkara').value;
-        const data = perkaraOptions.find(p => p.perkara === selected);
+            @foreach ($jadwalList as $j)
+                editModalInstances[{{ $j->id }}] = new bootstrap.Modal(document.getElementById('editJadwalModal{{ $j->id }}'));
+            @endforeach
 
-        const penggugatDisplay = document.getElementById('f_penggugat_display');
-        const tergugatDisplay = document.getElementById('f_tergugat_display');
-        const agendaDisplay = document.getElementById('f_agenda_display');
+            @if ($errors->any())
+                addModalInstance.show();
+            @endif
 
-        if (data) {
-            penggugatDisplay.textContent = data.penggugat;
-            penggugatDisplay.classList.remove('is-empty');
-            document.getElementById('f_penggugat').value = data.penggugat;
-
-            tergugatDisplay.textContent = data.tergugat;
-            tergugatDisplay.classList.remove('is-empty');
-            document.getElementById('f_tergugat').value = data.tergugat;
-
-            agendaDisplay.textContent = data.agenda;
-            agendaDisplay.classList.remove('is-empty');
-            document.getElementById('f_agenda').value = data.agenda;
-        } else {
-            penggugatDisplay.textContent = 'Pilih No. Perkara dulu';
-            penggugatDisplay.classList.add('is-empty');
-            document.getElementById('f_penggugat').value = '';
-
-            tergugatDisplay.textContent = 'Pilih No. Perkara dulu';
-            tergugatDisplay.classList.add('is-empty');
-            document.getElementById('f_tergugat').value = '';
-
-            agendaDisplay.textContent = 'Pilih No. Perkara dulu';
-            agendaDisplay.classList.add('is-empty');
-            document.getElementById('f_agenda').value = '';
-        }
-    }
-
-    function renderTable() {
-        const tbody = document.getElementById('tableBody');
-        const emptyState = document.getElementById('emptyState');
-        tbody.innerHTML = '';
-
-        if (jadwalData.length === 0) {
-            emptyState.classList.remove('d-none');
-            return;
-        }
-        emptyState.classList.add('d-none');
-
-        jadwalData.forEach((s, i) => {
-            const row = document.createElement('tr');
-            row.style.borderTop = '1px solid #f1f1f1';
-            row.innerHTML = `
-                <td class="px-3 py-3 text-secondary">${i + 1}</td>
-                <td class="px-3 py-3 fw-semibold text-dark">${s.perkara}</td>
-                <td class="px-3 py-3">${s.agenda}</td>
-                <td class="px-3 py-3">${s.tanggal}</td>
-                <td class="px-3 py-3 fw-medium">${s.waktu}</td>
-                <td class="px-3 py-3">${s.ruang}</td>
-                <td class="px-3 py-3">${s.hakim_ketua}</td>
-                <td class="px-3 py-3">${s.hakim_1}</td>
-                <td class="px-3 py-3">${s.hakim_2}</td>
-                <td class="px-3 py-3">${s.panitera}</td>
-                <td class="px-3 py-3">${s.penggugat}</td>
-                <td class="px-3 py-3">${s.tergugat}</td>
-                <td class="px-3 py-3 text-center">
-                    <button onclick="editJadwal(${i})" class="btn btn-link btn-sm text-decoration-none p-0 me-3">Edit</button>
-                    <button onclick="deleteJadwal(${i})" class="btn btn-link btn-sm text-decoration-none text-danger p-0">Hapus</button>
-                </td>
-            `;
-            tbody.appendChild(row);
+            // Isi tampilan autofill untuk semua modal Edit sesuai perkara yang sedang tersimpan
+            @foreach ($jadwalList as $j)
+                handlePerkaraChange('edit{{ $j->id }}');
+            @endforeach
         });
-    }
 
-    function openModal() {
-        document.getElementById('modalTitle').textContent = 'Tambah Jadwal Sidang';
-        document.getElementById('jadwalForm').reset();
-        document.getElementById('editIndex').value = '';
-        handlePerkaraChange(); // reset tampilan autofill
-        jadwalModalInstance.show();
-    }
+        // suffix contoh: 'add' -> elemen id f_perkara_add, f_penggugat_display_add, dst
+        // atau 'edit123' -> elemen id f_perkara_edit123, f_penggugat_display_edit123, dst
+        function handlePerkaraChange(suffix) {
+            const select = document.getElementById('f_perkara_' + suffix);
+            const selectedId = parseInt(select.value, 10);
+            const data = perkaraOptions.find(p => p.id === selectedId);
 
-    function editJadwal(index) {
-        const s = jadwalData[index];
-        document.getElementById('modalTitle').textContent = 'Edit Jadwal Sidang';
-        document.getElementById('editIndex').value = index;
+            const penggugatDisplay = document.getElementById('f_penggugat_display_' + suffix);
+            const tergugatDisplay = document.getElementById('f_tergugat_display_' + suffix);
+            const agendaDisplay = document.getElementById('f_agenda_display_' + suffix);
 
-        document.getElementById('f_perkara').value = s.perkara;
-        handlePerkaraChange();
+            if (data) {
+                const penggugatNames = data.pihak.filter(p => p.tipe === 'penggugat').map(p => p.nama).join(', ');
+                const tergugatNames = data.pihak.filter(p => p.tipe === 'tergugat').map(p => p.nama).join(', ');
 
-        document.getElementById('f_tanggal').value = s.tanggal;
-        document.getElementById('f_waktu').value = convertToTimeInput(s.waktu);
-        document.getElementById('f_ruang').value = s.ruang;
-        document.getElementById('f_hakim_ketua').value = s.hakim_ketua;
-        document.getElementById('f_hakim_1').value = s.hakim_1;
-        document.getElementById('f_hakim_2').value = s.hakim_2;
-        document.getElementById('f_panitera').value = s.panitera;
+                penggugatDisplay.textContent = penggugatNames || '-';
+                penggugatDisplay.classList.remove('is-empty');
 
-        jadwalModalInstance.show();
-    }
+                tergugatDisplay.textContent = tergugatNames || '-';
+                tergugatDisplay.classList.remove('is-empty');
 
-    function deleteJadwal(index) {
-        if (confirm('Yakin ingin menghapus jadwal ini?')) {
-            jadwalData.splice(index, 1);
-            renderTable();
-        }
-    }
+                agendaDisplay.textContent = data.agenda;
+                agendaDisplay.classList.remove('is-empty');
+            } else {
+                penggugatDisplay.textContent = 'Pilih No. Perkara dulu';
+                penggugatDisplay.classList.add('is-empty');
 
-    function closeModal() {
-        jadwalModalInstance.hide();
-    }
+                tergugatDisplay.textContent = 'Pilih No. Perkara dulu';
+                tergugatDisplay.classList.add('is-empty');
 
-    function saveJadwal(event) {
-        event.preventDefault();
-
-        const data = {
-            perkara: document.getElementById('f_perkara').value,
-            agenda: document.getElementById('f_agenda').value,
-            tanggal: document.getElementById('f_tanggal').value,
-            waktu: convertToDisplayTime(document.getElementById('f_waktu').value),
-            ruang: document.getElementById('f_ruang').value,
-            hakim_ketua: document.getElementById('f_hakim_ketua').value,
-            hakim_1: document.getElementById('f_hakim_1').value,
-            hakim_2: document.getElementById('f_hakim_2').value,
-            panitera: document.getElementById('f_panitera').value,
-            penggugat: document.getElementById('f_penggugat').value,
-            tergugat: document.getElementById('f_tergugat').value,
-        };
-
-        const editIndex = document.getElementById('editIndex').value;
-        if (editIndex === '') {
-            jadwalData.push(data);
-        } else {
-            jadwalData[editIndex] = data;
+                agendaDisplay.textContent = 'Pilih No. Perkara dulu';
+                agendaDisplay.classList.add('is-empty');
+            }
         }
 
-        renderTable();
-        closeModal();
-    }
+        function openAddModal() {
+            addModalInstance.show();
+        }
+        function closeAddModal() {
+            addModalInstance.hide();
+        }
 
-    // Helper: format "08.30" <-> "08:30" (input type="time" pakai titik dua)
-    function convertToTimeInput(displayTime) {
-        return displayTime.replace('.', ':');
-    }
-    function convertToDisplayTime(timeInputValue) {
-        return timeInputValue.replace(':', '.');
-    }
+        function openEditModal(id) {
+            editModalInstances[id].show();
+        }
+        function closeEditModal(id) {
+            editModalInstances[id].hide();
+        }
 
-    renderTable();
+        function askDelete(formId, message) {
+            formToDelete = document.getElementById(formId);
+            document.getElementById('deleteConfirmText').textContent = message;
+            deleteModalInstance.show();
+        }
+        function confirmDeleteSubmit() {
+            if (formToDelete) {
+                formToDelete.submit();
+            }
+        }
+    @endif
 </script>
 
 @endsection

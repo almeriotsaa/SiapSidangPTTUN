@@ -73,14 +73,27 @@
             <div>
                 <h1 class="h3 fw-bold text-dark mb-1">Kelola Perkara</h1>
                 <p class="text-secondary small mb-0">
-                    Tambah, ubah, atau hapus data perkara &middot; Data ini masih dummy (belum tersambung database)
+                    Tambah, ubah, atau hapus data perkara
                 </p>
             </div>
-            <button type="button" onclick="openModal()"
+            <button type="button" onclick="openAddModal()"
                 class="btn btn-primary d-flex align-items-center gap-2">
                 <span class="fs-5 lh-1">+</span> Buat Perkara
             </button>
         </div>
+
+        @if (session('success'))
+            <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
         {{-- Table --}}
         <div class="table-card">
@@ -95,81 +108,103 @@
                         <th class="px-3 py-3 text-center">Aksi</th>
                     </tr>
                 </thead>
-                <tbody id="tableBody">
-                    {{-- Diisi otomatis oleh JavaScript --}}
+                <tbody>
+                    @forelse ($perkaraList as $i => $p)
+                        <tr style="border-top:1px solid #f1f1f1;">
+                            <td class="px-3 py-3 text-secondary">{{ $i + 1 }}</td>
+                            <td class="px-3 py-3 fw-semibold text-dark">{{ $p->nomor_perkara }}</td>
+                            <td class="px-3 py-3">{{ $p->agenda }}</td>
+                            <td class="px-3 py-3">
+                                @foreach ($p->pihak->where('tipe', 'penggugat') as $pg)
+                                    <span class="pihak-pill">{{ $pg->nama }}</span>
+                                @endforeach
+                            </td>
+                            <td class="px-3 py-3">
+                                @foreach ($p->pihak->where('tipe', 'tergugat') as $tg)
+                                    <span class="pihak-pill">{{ $tg->nama }}</span>
+                                @endforeach
+                            </td>
+                            <td class="px-3 py-3 text-center">
+                                <button type="button" class="btn btn-link btn-sm text-decoration-none p-0 me-3"
+                                    onclick="openEditModal({{ $p->id }})">Edit</button>
+                                <form id="deletePerkaraForm{{ $p->id }}" method="POST" action="{{ route('perkara.destroy', $p->id) }}" class="d-none">
+                                    @csrf
+                                    @method('DELETE')
+                                </form>
+                                <button type="button" class="btn btn-link btn-sm text-decoration-none text-danger p-0"
+                                    onclick="askDelete('deletePerkaraForm{{ $p->id }}', 'Yakin ingin menghapus perkara {{ $p->nomor_perkara }}? Semua jadwal sidang dan riwayat kehadiran terkait juga akan terhapus.')">
+                                    Hapus
+                                </button>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="text-center text-secondary small py-5">
+                                Belum ada data perkara. Klik "Buat Perkara" untuk menambahkan.
+                            </td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
 
-        <p id="emptyState" class="d-none text-center text-secondary small py-5">
-            Belum ada data perkara. Klik "Buat Perkara" untuk menambahkan.
-        </p>
-
     </div>
 </section>
 
-{{-- Modal Form Perkara --}}
-<div class="modal fade" id="perkaraModal" tabindex="-1" aria-hidden="true">
+{{-- Modal Tambah Perkara --}}
+<div class="modal fade" id="addPerkaraModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content rounded-4">
             <div class="modal-header border-0 pb-0">
-                <h2 id="modalTitle" class="h5 fw-bold text-dark mb-0">Buat Perkara</h2>
-                <button type="button" class="btn-close" onclick="closeModal()" aria-label="Close"></button>
+                <h2 class="h5 fw-bold text-dark mb-0">Buat Perkara</h2>
+                <button type="button" class="btn-close" onclick="closeAddModal()" aria-label="Close"></button>
             </div>
-
             <div class="modal-body">
-                <form id="perkaraForm" onsubmit="savePerkara(event)">
-                    <input type="hidden" id="editIndex" value="">
+                <form method="POST" action="{{ route('perkara.store') }}">
+                    @csrf
 
                     <div class="mb-3">
                         <label class="form-label fw-semibold small text-dark">No. Perkara</label>
-                        <input id="f_perkara" type="text" required placeholder="123/Pdt.G/2026/PN.Jkt.Ps"
-                            class="form-control">
+                        <input type="text" name="nomor_perkara" class="form-control" required
+                            placeholder="123/Pdt.G/2026/PN.Jkt.Ps">
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label fw-semibold small text-dark">Agenda</label>
-                        <input id="f_agenda" type="text" required placeholder="Pembuktian Penggugat"
-                            class="form-control">
+                        <input type="text" name="agenda" class="form-control" required
+                            placeholder="Pembuktian Penggugat">
                     </div>
 
-                    {{-- Penggugat: bisa lebih dari 1 --}}
                     <div class="mb-3">
                         <label class="form-label fw-semibold small text-dark">Penggugat</label>
-                        <div id="penggugatFieldsWrapper">
+                        <div id="addPenggugatWrapper">
                             <div class="name-row">
-                                <input type="text" class="form-control penggugat-input" required
-                                    placeholder="Tajudin">
+                                <input type="text" name="penggugat[]" class="form-control" required placeholder="Tajudin">
                             </div>
                         </div>
-                        <button type="button" onclick="addNameField('penggugatFieldsWrapper', 'penggugat-input', 'Nama penggugat lainnya')"
+                        <button type="button" onclick="addNameField('addPenggugatWrapper', 'penggugat[]', 'Nama penggugat lainnya')"
                             class="btn btn-outline-primary btn-sm d-flex align-items-center gap-1">
                             <span class="fs-6 lh-1">+</span> Tambah Penggugat
                         </button>
                     </div>
 
-                    {{-- Tergugat: bisa lebih dari 1 --}}
                     <div class="mb-3 pt-2 border-top">
                         <label class="form-label fw-semibold small text-dark mt-3">Tergugat</label>
-                        <div id="tergugatFieldsWrapper">
+                        <div id="addTergugatWrapper">
                             <div class="name-row">
-                                <input type="text" class="form-control tergugat-input" required
+                                <input type="text" name="tergugat[]" class="form-control" required
                                     placeholder="Kepala Kantor Pertanahan Kabupaten Pandeglang">
                             </div>
                         </div>
-                        <button type="button" onclick="addNameField('tergugatFieldsWrapper', 'tergugat-input', 'Nama tergugat lainnya')"
+                        <button type="button" onclick="addNameField('addTergugatWrapper', 'tergugat[]', 'Nama tergugat lainnya')"
                             class="btn btn-outline-primary btn-sm d-flex align-items-center gap-1">
                             <span class="fs-6 lh-1">+</span> Tambah Tergugat
                         </button>
                     </div>
 
                     <div class="d-flex gap-3 pt-2 border-top">
-                        <button type="button" onclick="closeModal()" class="btn btn-outline-secondary flex-fill mt-3">
-                            Batal
-                        </button>
-                        <button type="submit" class="btn btn-primary flex-fill mt-3">
-                            Simpan
-                        </button>
+                        <button type="button" onclick="closeAddModal()" class="btn btn-outline-secondary flex-fill mt-3">Batal</button>
+                        <button type="submit" class="btn btn-primary flex-fill mt-3">Simpan</button>
                     </div>
                 </form>
             </div>
@@ -177,169 +212,142 @@
     </div>
 </div>
 
-<script>
-    // ============================================
-    // DUMMY DATA — belum tersambung database.
-    // penggugat & tergugat sekarang berupa array (bisa lebih dari 1 nama).
-    // Struktur ini murni untuk preview UI, belum ada validasi server-side,
-    // belum ada CSRF protection, dan tidak persist setelah refresh.
-    // ============================================
-    let perkaraData = [
-        {
-            perkara: '123/Pdt.G/2026/PN.Jkt.Ps',
-            agenda: 'Pembuktian Penggugat',
-            penggugat: ['Tajudin', 'Dkk'],
-            tergugat: ['Kepala Kantor Pertanahan Kabupaten Pandeglang'],
-        },
-    ];
+{{-- Modal Edit Perkara — satu per baris data, sudah pre-filled dari server --}}
+@foreach ($perkaraList as $p)
+    <div class="modal fade" id="editPerkaraModal{{ $p->id }}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content rounded-4">
+                <div class="modal-header border-0 pb-0">
+                    <h2 class="h5 fw-bold text-dark mb-0">Edit Perkara</h2>
+                    <button type="button" class="btn-close" onclick="closeEditModal({{ $p->id }})" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="{{ route('perkara.update', $p->id) }}">
+                        @csrf
+                        @method('PUT')
 
-    let perkaraModalInstance = null;
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small text-dark">No. Perkara</label>
+                            <input type="text" name="nomor_perkara" class="form-control" required value="{{ $p->nomor_perkara }}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small text-dark">Agenda</label>
+                            <input type="text" name="agenda" class="form-control" required value="{{ $p->agenda }}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small text-dark">Penggugat</label>
+                            <div id="editPenggugatWrapper{{ $p->id }}">
+                                @foreach ($p->pihak->where('tipe', 'penggugat') as $idx => $pg)
+                                    <div class="name-row">
+                                        <input type="text" name="penggugat[]" class="form-control" required value="{{ $pg->nama }}">
+                                        @if ($idx > 0)
+                                            <button type="button" class="btn btn-outline-danger btn-remove-name" onclick="this.parentElement.remove()">&times;</button>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                            <button type="button" onclick="addNameField('editPenggugatWrapper{{ $p->id }}', 'penggugat[]', 'Nama penggugat lainnya')"
+                                class="btn btn-outline-primary btn-sm d-flex align-items-center gap-1">
+                                <span class="fs-6 lh-1">+</span> Tambah Penggugat
+                            </button>
+                        </div>
+
+                        <div class="mb-3 pt-2 border-top">
+                            <label class="form-label fw-semibold small text-dark mt-3">Tergugat</label>
+                            <div id="editTergugatWrapper{{ $p->id }}">
+                                @foreach ($p->pihak->where('tipe', 'tergugat') as $idx => $tg)
+                                    <div class="name-row">
+                                        <input type="text" name="tergugat[]" class="form-control" required value="{{ $tg->nama }}">
+                                        @if ($idx > 0)
+                                            <button type="button" class="btn btn-outline-danger btn-remove-name" onclick="this.parentElement.remove()">&times;</button>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                            <button type="button" onclick="addNameField('editTergugatWrapper{{ $p->id }}', 'tergugat[]', 'Nama tergugat lainnya')"
+                                class="btn btn-outline-primary btn-sm d-flex align-items-center gap-1">
+                                <span class="fs-6 lh-1">+</span> Tambah Tergugat
+                            </button>
+                        </div>
+
+                        <div class="d-flex gap-3 pt-2 border-top">
+                            <button type="button" onclick="closeEditModal({{ $p->id }})" class="btn btn-outline-secondary flex-fill mt-3">Batal</button>
+                            <button type="submit" class="btn btn-primary flex-fill mt-3">Simpan Perubahan</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+@endforeach
+
+{{-- Modal Konfirmasi Hapus --}}
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4">
+            <div class="modal-body text-center pt-4 pb-2">
+                <p class="fw-bold text-dark mb-1">Hapus data ini?</p>
+                <p id="deleteConfirmText" class="text-secondary small mb-0">Apakah Anda yakin ingin menghapus data ini?</p>
+            </div>
+            <div class="modal-footer border-0 justify-content-center gap-2 pb-4">
+                <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-danger px-4" onclick="confirmDeleteSubmit()">Hapus</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let addModalInstance = null;
+    const editModalInstances = {};
+    let deleteModalInstance = null;
+    let formToDelete = null;
+
     document.addEventListener('DOMContentLoaded', function () {
-        perkaraModalInstance = new bootstrap.Modal(document.getElementById('perkaraModal'));
+        addModalInstance = new bootstrap.Modal(document.getElementById('addPerkaraModal'));
+        deleteModalInstance = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+
+        @foreach ($perkaraList as $p)
+            editModalInstances[{{ $p->id }}] = new bootstrap.Modal(document.getElementById('editPerkaraModal{{ $p->id }}'));
+        @endforeach
+
+        @if ($errors->any())
+            addModalInstance.show();
+        @endif
     });
 
-    // Tambah satu baris input nama baru ke wrapper tertentu (dipakai untuk Penggugat & Tergugat)
-    function addNameField(wrapperId, inputClass, placeholderText) {
+    // Dipakai di modal Tambah maupun Edit — wrapperId & inputName beda-beda per konteks
+    function addNameField(wrapperId, inputName, placeholderText) {
         const wrapper = document.getElementById(wrapperId);
-
         const row = document.createElement('div');
         row.className = 'name-row';
         row.innerHTML = `
-            <input type="text" class="form-control ${inputClass}" required
-                placeholder="${placeholderText}">
-            <button type="button" class="btn btn-outline-danger btn-remove-name" onclick="this.parentElement.remove()">
-                &times;
-            </button>
+            <input type="text" name="${inputName}" class="form-control" required placeholder="${placeholderText}">
+            <button type="button" class="btn btn-outline-danger btn-remove-name" onclick="this.parentElement.remove()">&times;</button>
         `;
         wrapper.appendChild(row);
     }
 
-    // Reset wrapper jadi 1 input kosong lagi
-    function resetNameFields(wrapperId, inputClass, placeholderText) {
-        document.getElementById(wrapperId).innerHTML = `
-            <div class="name-row">
-                <input type="text" class="form-control ${inputClass}" required
-                    placeholder="${placeholderText}">
-            </div>
-        `;
+    function openAddModal() { addModalInstance.show(); }
+    function closeAddModal() { addModalInstance.hide(); }
+
+    function openEditModal(id) { editModalInstances[id].show(); }
+    function closeEditModal(id) { editModalInstances[id].hide(); }
+
+    // Buka modal konfirmasi, simpan form mana yang harus disubmit kalau user klik "Hapus"
+    function askDelete(formId, message) {
+        formToDelete = document.getElementById(formId);
+        document.getElementById('deleteConfirmText').textContent = message;
+        deleteModalInstance.show();
     }
 
-    // Isi ulang wrapper sesuai jumlah data yang ada (dipakai saat Edit)
-    function fillNameFields(wrapperId, inputClass, placeholderText, values) {
-        const wrapper = document.getElementById(wrapperId);
-        wrapper.innerHTML = '';
-
-        values.forEach((val, i) => {
-            const row = document.createElement('div');
-            row.className = 'name-row';
-            const removeBtn = i === 0
-                ? ''
-                : `<button type="button" class="btn btn-outline-danger btn-remove-name" onclick="this.parentElement.remove()">&times;</button>`;
-            row.innerHTML = `
-                <input type="text" class="form-control ${inputClass}" required
-                    placeholder="${placeholderText}" value="${val}">
-                ${removeBtn}
-            `;
-            wrapper.appendChild(row);
-        });
-    }
-
-    function renderTable() {
-        const tbody = document.getElementById('tableBody');
-        const emptyState = document.getElementById('emptyState');
-        tbody.innerHTML = '';
-
-        if (perkaraData.length === 0) {
-            emptyState.classList.remove('d-none');
-            return;
-        }
-        emptyState.classList.add('d-none');
-
-        perkaraData.forEach((p, i) => {
-            const row = document.createElement('tr');
-            row.style.borderTop = '1px solid #f1f1f1';
-
-            const penggugatPills = p.penggugat.map(nama => `<span class="pihak-pill">${nama}</span>`).join('');
-            const tergugatPills = p.tergugat.map(nama => `<span class="pihak-pill">${nama}</span>`).join('');
-
-            row.innerHTML = `
-                <td class="px-3 py-3 text-secondary">${i + 1}</td>
-                <td class="px-3 py-3 fw-semibold text-dark">${p.perkara}</td>
-                <td class="px-3 py-3">${p.agenda}</td>
-                <td class="px-3 py-3">${penggugatPills}</td>
-                <td class="px-3 py-3">${tergugatPills}</td>
-                <td class="px-3 py-3 text-center">
-                    <button onclick="editPerkara(${i})" class="btn btn-link btn-sm text-decoration-none p-0 me-3">Edit</button>
-                    <button onclick="deletePerkara(${i})" class="btn btn-link btn-sm text-decoration-none text-danger p-0">Hapus</button>
-                </td>
-            `;
-            tbody.appendChild(row);
-        });
-    }
-
-    function openModal() {
-        document.getElementById('modalTitle').textContent = 'Buat Perkara';
-        document.getElementById('perkaraForm').reset();
-        document.getElementById('editIndex').value = '';
-        resetNameFields('penggugatFieldsWrapper', 'penggugat-input', 'Nama penggugat lainnya');
-        resetNameFields('tergugatFieldsWrapper', 'tergugat-input', 'Nama tergugat lainnya');
-        perkaraModalInstance.show();
-    }
-
-    function editPerkara(index) {
-        const p = perkaraData[index];
-        document.getElementById('modalTitle').textContent = 'Edit Perkara';
-        document.getElementById('editIndex').value = index;
-        document.getElementById('f_perkara').value = p.perkara;
-        document.getElementById('f_agenda').value = p.agenda;
-
-        fillNameFields('penggugatFieldsWrapper', 'penggugat-input', 'Nama penggugat lainnya', p.penggugat);
-        fillNameFields('tergugatFieldsWrapper', 'tergugat-input', 'Nama tergugat lainnya', p.tergugat);
-
-        perkaraModalInstance.show();
-    }
-
-    function deletePerkara(index) {
-        if (confirm('Yakin ingin menghapus data perkara ini?')) {
-            perkaraData.splice(index, 1);
-            renderTable();
+    function confirmDeleteSubmit() {
+        if (formToDelete) {
+            formToDelete.submit();
         }
     }
-
-    function closeModal() {
-        perkaraModalInstance.hide();
-    }
-
-    function savePerkara(event) {
-        event.preventDefault();
-
-        const penggugatValues = Array.from(document.querySelectorAll('.penggugat-input'))
-            .map(el => el.value.trim())
-            .filter(v => v !== '');
-
-        const tergugatValues = Array.from(document.querySelectorAll('.tergugat-input'))
-            .map(el => el.value.trim())
-            .filter(v => v !== '');
-
-        const data = {
-            perkara: document.getElementById('f_perkara').value,
-            agenda: document.getElementById('f_agenda').value,
-            penggugat: penggugatValues,
-            tergugat: tergugatValues,
-        };
-
-        const editIndex = document.getElementById('editIndex').value;
-        if (editIndex === '') {
-            perkaraData.push(data);
-        } else {
-            perkaraData[editIndex] = data;
-        }
-
-        renderTable();
-        closeModal();
-    }
-
-    renderTable();
 </script>
 
 @endsection

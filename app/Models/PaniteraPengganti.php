@@ -8,5 +8,12 @@ class PaniteraPengganti extends Model
 {
     protected $table = 'panitera_pengganti';
 
-    protected $guarded = [];
+    protected $fillable = [
+        'nama',
+        'aktif',
+    ];
+
+    protected $casts = [
+        'aktif' => 'boolean',
+    ];
 }
