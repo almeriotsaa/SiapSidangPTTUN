@@ -136,12 +136,12 @@
                         <td class="px-3 py-3">{{ $j->hakimAnggota2->nama }}</td>
                         <td class="px-3 py-3">{{ $j->panitera->nama }}</td>
                         <td class="px-3 py-3">
-                            @foreach ($j->perkara->pihak->where('tipe', 'penggugat') as $pg)
+                            @foreach ($j->perkara->pihakPerkara->where('tipe', 'penggugat') as $pg)
                                 <span class="pihak-pill">{{ $pg->nama }}</span>
                             @endforeach
                         </td>
                         <td class="px-3 py-3">
-                            @foreach ($j->perkara->pihak->where('tipe', 'tergugat') as $tg)
+                            @foreach ($j->perkara->pihakPerkara->where('tipe', 'tergugat') as $tg)
                                 <span class="pihak-pill">{{ $tg->nama }}</span>
                             @endforeach
                         </td>

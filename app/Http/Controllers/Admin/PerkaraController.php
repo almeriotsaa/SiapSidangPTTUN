@@ -12,7 +12,7 @@ class PerkaraController extends Controller
 {
     public function index()
     {
-        $perkaraList = Perkara::with('pihak')->orderByDesc('id')->get();
+        $perkaraList = Perkara::with('pihakPerkara')->orderByDesc('id')->get();
 
         return view('perkara.perkara', compact('perkaraList'));
     }
@@ -75,7 +75,7 @@ class PerkaraController extends Controller
             // terhubung ke pihak_perkara dengan cascadeOnDelete, mengedit daftar
             // Penggugat/Tergugat pada perkara yang SUDAH punya riwayat kehadiran
             // akan ikut menghapus riwayat kehadiran terkait pihak yang dihapus.
-            $perkara->pihak()->delete();
+            $perkara->pihakPerkara()->delete();
 
             foreach ($validated['penggugat'] as $nama) {
                 PihakPerkara::create([

@@ -115,12 +115,12 @@
                             <td class="px-3 py-3 fw-semibold text-dark">{{ $p->nomor_perkara }}</td>
                             <td class="px-3 py-3">{{ $p->agenda }}</td>
                             <td class="px-3 py-3">
-                                @foreach ($p->pihak->where('tipe', 'penggugat') as $pg)
+                                @foreach ($p->pihakPerkara->where('tipe', 'penggugat') as $pg)
                                     <span class="pihak-pill">{{ $pg->nama }}</span>
                                 @endforeach
                             </td>
                             <td class="px-3 py-3">
-                                @foreach ($p->pihak->where('tipe', 'tergugat') as $tg)
+                                @foreach ($p->pihakPerkara->where('tipe', 'tergugat') as $tg)
                                     <span class="pihak-pill">{{ $tg->nama }}</span>
                                 @endforeach
                             </td>
@@ -239,7 +239,7 @@
                         <div class="mb-3">
                             <label class="form-label fw-semibold small text-dark">Penggugat</label>
                             <div id="editPenggugatWrapper{{ $p->id }}">
-                                @foreach ($p->pihak->where('tipe', 'penggugat') as $idx => $pg)
+                                @foreach ($p->pihakPerkara->where('tipe', 'penggugat') as $idx => $pg)
                                     <div class="name-row">
                                         <input type="text" name="penggugat[]" class="form-control" required value="{{ $pg->nama }}">
                                         @if ($idx > 0)
@@ -257,7 +257,7 @@
                         <div class="mb-3 pt-2 border-top">
                             <label class="form-label fw-semibold small text-dark mt-3">Tergugat</label>
                             <div id="editTergugatWrapper{{ $p->id }}">
-                                @foreach ($p->pihak->where('tipe', 'tergugat') as $idx => $tg)
+                                @foreach ($p->pihakPerkara->where('tipe', 'tergugat') as $idx => $tg)
                                     <div class="name-row">
                                         <input type="text" name="tergugat[]" class="form-control" required value="{{ $tg->nama }}">
                                         @if ($idx > 0)
