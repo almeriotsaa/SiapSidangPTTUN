@@ -63,7 +63,7 @@ class JadwalSidang extends Model
     public function scopeWithFullDetail($query)
     {
         return $query->with([
-            'perkara.pihakPerkara',
+            'perkara.pihak',
             'hakimKetua',
             'hakimAnggota1',
             'hakimAnggota2',

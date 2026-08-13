@@ -29,7 +29,7 @@
         white-space:nowrap;
     }
     .table-card tbody td {
-        vertical-align:middle;
+        vertical-align:top;
         font-size:.9rem;
     }
     .table-card tbody tr:hover {
@@ -39,11 +39,21 @@
         overflow-x:auto;
     }
 
-    .status-cell {
+    .pihak-row {
         display:flex;
-        align-items:center;
+        align-items:flex-start;
         gap:8px;
-        white-space:nowrap;
+        margin-bottom:6px;
+    }
+    .pihak-row:last-child {
+        margin-bottom:0;
+    }
+    .pihak-nama {
+        width:110px;
+        flex:0 0 110px;
+        white-space:normal;
+        word-break:break-word;
+        padding-top:2px;
     }
 
     .badge-status {
@@ -66,23 +76,9 @@
         background:#f3f4f6; color:#4b5563; border:1px solid #e5e7eb;
     }
 
-    .badge-tipe {
-        display:inline-block;
-        padding:2px 8px;
-        border-radius:.4rem;
-        font-size:.72rem;
-        font-weight:600;
-    }
-    .badge-tipe-penggugat {
-        background:#eef2ff; color:#4338ca;
-    }
-    .badge-tipe-tergugat {
-        background:#fff7ed; color:#c2410c;
-    }
-
     .btn-tandai-hadir {
-        font-size:.75rem;
-        padding:.3rem .7rem;
+        font-size:.72rem;
+        padding:.2rem .6rem;
         border-radius:999px;
     }
 </style>
@@ -119,53 +115,81 @@
                         <th class="px-3 py-3">Tanggal</th>
                         <th class="px-3 py-3">Waktu</th>
                         <th class="px-3 py-3">Ruang</th>
-                        <th class="px-3 py-3">Pihak</th>
-                        <th class="px-3 py-3">Tipe</th>
-                        <th class="px-3 py-3">Status</th>
+                        <th class="px-3 py-3">Penggugat</th>
+                        <th class="px-3 py-3">Tergugat</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($kehadiranList as $i => $k)
+                    @forelse ($jadwalList as $i => $j)
                         @php
-                            $jadwal = $k->jadwalSidang;
-                            $lewatBatas = $jadwal->sudahLewatBatas();
-                            $bisaTandaiHadir = auth()->user()->role !== 'admin' && $k->status !== 'Hadir' && !$lewatBatas;
+                            $lewatBatas = $j->sudahLewatBatas();
+                            $penggugatList = $j->kehadiran->filter(fn ($k) => $k->pihak && $k->pihak->tipe === 'penggugat');
+                            $tergugatList  = $j->kehadiran->filter(fn ($k) => $k->pihak && $k->pihak->tipe === 'tergugat');
                         @endphp
                         <tr style="border-top:1px solid #f1f1f1;">
                             <td class="px-3 py-3 text-secondary">{{ $i + 1 }}</td>
-                            <td class="px-3 py-3 fw-semibold text-dark">{{ $jadwal->perkara->nomor_perkara }}</td>
-                            <td class="px-3 py-3">{{ $jadwal->tanggal_sidang->format('d M Y') }}</td>
-                            <td class="px-3 py-3 fw-medium">{{ substr($jadwal->jam_sidang, 0, 5) }}</td>
-                            <td class="px-3 py-3">{{ $jadwal->ruang_sidang }}</td>
-                            <td class="px-3 py-3">{{ $k->pihak->nama }}</td>
+                            <td class="px-3 py-3 fw-semibold text-dark">{{ $j->perkara->nomor_perkara }}</td>
+                            <td class="px-3 py-3">{{ $j->tanggal_sidang->format('d M Y') }}</td>
+                            <td class="px-3 py-3 fw-medium">{{ substr($j->jam_sidang, 0, 5) }}</td>
+                            <td class="px-3 py-3">{{ $j->ruang_sidang }}</td>
+
+                            {{-- Kolom Penggugat: semua pihak ditumpuk di sini, bukan kolom baru --}}
                             <td class="px-3 py-3">
-                                @if ($k->pihak->tipe === 'penggugat')
-                                    <span class="badge-tipe badge-tipe-penggugat">Penggugat</span>
-                                @else
-                                    <span class="badge-tipe badge-tipe-tergugat">Tergugat</span>
-                                @endif
-                            </td>
-                            <td class="px-3 py-3">
-                                @if ($k->status === 'Hadir')
-                                    <span class="badge-status badge-status-hadir">&#9679; Hadir</span>
-                                @elseif ($lewatBatas)
-                                    <span class="badge-status badge-status-tidak-hadir">&#9679; Tidak Hadir</span>
-                                @elseif ($bisaTandaiHadir)
-                                    <div class="status-cell">
-                                        <span class="badge-status badge-status-belum-hadir">&#9679; Belum Hadir</span>
-                                        <form method="POST" action="{{ route('kehadiran.tandai-hadir', $k->id) }}" class="d-inline">
-                                            @csrf
-                                            <button type="submit" class="btn btn-success btn-tandai-hadir">Hadir</button>
-                                        </form>
+                                @forelse ($penggugatList as $k)
+                                    @php
+                                        $bisaTandaiHadir = auth()->user()->role !== 'admin' && $k->status !== 'Hadir' && !$lewatBatas;
+                                    @endphp
+                                    <div class="pihak-row">
+                                        <span class="pihak-nama">{{ $k->pihak->nama }}</span>
+                                        @if ($k->status === 'Hadir')
+                                            <span class="badge-status badge-status-hadir">&#9679; Hadir</span>
+                                        @elseif ($lewatBatas)
+                                            <span class="badge-status badge-status-tidak-hadir">&#9679; Tidak Hadir</span>
+                                        @elseif ($bisaTandaiHadir)
+                                            <span class="badge-status badge-status-belum-hadir">&#9679; Belum Hadir</span>
+                                            <form method="POST" action="{{ route('kehadiran.tandai-hadir', $k->id) }}" class="d-inline">
+                                                @csrf
+                                                <button type="submit" class="btn btn-success btn-tandai-hadir">Hadir</button>
+                                            </form>
+                                        @else
+                                            <span class="badge-status badge-status-belum-hadir">&#9679; Belum Hadir</span>
+                                        @endif
                                     </div>
-                                @else
-                                    <span class="badge-status badge-status-belum-hadir">&#9679; Belum Hadir</span>
-                                @endif
+                                @empty
+                                    <span class="text-secondary">-</span>
+                                @endforelse
+                            </td>
+
+                            {{-- Kolom Tergugat: sama, ditumpuk di dalam satu kolom --}}
+                            <td class="px-3 py-3">
+                                @forelse ($tergugatList as $k)
+                                    @php
+                                        $bisaTandaiHadir = auth()->user()->role !== 'admin' && $k->status !== 'Hadir' && !$lewatBatas;
+                                    @endphp
+                                    <div class="pihak-row">
+                                        <span class="pihak-nama">{{ $k->pihak->nama }}</span>
+                                        @if ($k->status === 'Hadir')
+                                            <span class="badge-status badge-status-hadir">&#9679; Hadir</span>
+                                        @elseif ($lewatBatas)
+                                            <span class="badge-status badge-status-tidak-hadir">&#9679; Tidak Hadir</span>
+                                        @elseif ($bisaTandaiHadir)
+                                            <span class="badge-status badge-status-belum-hadir">&#9679; Belum Hadir</span>
+                                            <form method="POST" action="{{ route('kehadiran.tandai-hadir', $k->id) }}" class="d-inline">
+                                                @csrf
+                                                <button type="submit" class="btn btn-success btn-tandai-hadir">Hadir</button>
+                                            </form>
+                                        @else
+                                            <span class="badge-status badge-status-belum-hadir">&#9679; Belum Hadir</span>
+                                        @endif
+                                    </div>
+                                @empty
+                                    <span class="text-secondary">-</span>
+                                @endforelse
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="text-center text-secondary small py-5">
+                            <td colspan="7" class="text-center text-secondary small py-5">
                                 Belum ada jadwal sidang.
                             </td>
                         </tr>

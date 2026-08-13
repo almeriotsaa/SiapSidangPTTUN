@@ -53,7 +53,7 @@
                     <li class="nav-item">
                         <a class="nav-link {{ request()->is('hakim*') ? 'active' : '' }}"
                             href="/hakim">
-                            Majelis Hakim/PP
+                            Hakim/PP
                         </a>
                     </li>
                 @endif

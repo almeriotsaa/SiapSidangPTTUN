@@ -18,7 +18,7 @@ class JadwalSidangController extends Controller
         $jadwalList = JadwalSidang::withFullDetail()->orderByDesc('tanggal_sidang')->orderBy('jam_sidang')->get();
 
         // Data untuk dropdown form Tambah/Edit — semua diambil dari database asli
-        $perkaraList  = Perkara::with('pihakPerkara')->orderBy('nomor_perkara')->get();
+        $perkaraList  = Perkara::with('pihak')->orderBy('nomor_perkara')->get();
         $hakimList    = Hakim::orderBy('nama')->get();
         $paniteraList = PaniteraPengganti::orderBy('nama')->get();
 
@@ -80,11 +80,9 @@ class JadwalSidangController extends Controller
         ]);
     }
 
-    // Buat baris kehadiran (status default 'Belum Hadir') untuk setiap Penggugat &
-    // Tergugat dari perkara yang dipilih, supaya langsung muncul di halaman Kehadiran.
     private function buatKehadiranUntukPerkara(JadwalSidang $jadwal): void
     {
-        $perkara = Perkara::with('pihakPerkara')->find($jadwal->perkara_id);
+        $perkara = Perkara::with('pihak')->find($jadwal->perkara_id);
 
         foreach ($perkara->pihakPerkara as $pihakPerkara) {
             Kehadiran::create([

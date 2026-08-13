@@ -57,14 +57,30 @@
     }
 
     .pihak-pill {
-        display:inline-block;
+        display:block;
+        width:max-content;
+        max-width:100%;
         background:#f3f4f6;
         color:#374151;
         border-radius:.4rem;
         padding:2px 8px;
         font-size:.8rem;
-        margin:2px 4px 2px 0;
+        margin-bottom:4px;
         white-space:normal;
+        word-break:break-word;
+    }
+    .pihak-pill:last-child {
+        margin-bottom:0;
+    }
+
+    .td-pihak {
+        white-space:normal;
+        max-width:200px;
+        min-width:140px;
+    }
+
+    .td-aksi {
+        white-space:nowrap;
     }
 </style>
 
@@ -135,18 +151,18 @@
                         <td class="px-3 py-3">{{ $j->hakimAnggota1->nama }}</td>
                         <td class="px-3 py-3">{{ $j->hakimAnggota2->nama }}</td>
                         <td class="px-3 py-3">{{ $j->panitera->nama }}</td>
-                        <td class="px-3 py-3">
-                            @foreach ($j->perkara->pihakPerkara->where('tipe', 'penggugat') as $pg)
+                        <td class="px-3 py-3 td-pihak">
+                            @foreach ($j->perkara->pihak->where('tipe', 'penggugat') as $pg)
                                 <span class="pihak-pill">{{ $pg->nama }}</span>
                             @endforeach
                         </td>
-                        <td class="px-3 py-3">
-                            @foreach ($j->perkara->pihakPerkara->where('tipe', 'tergugat') as $tg)
+                        <td class="px-3 py-3 td-pihak">
+                            @foreach ($j->perkara->pihak->where('tipe', 'tergugat') as $tg)
                                 <span class="pihak-pill">{{ $tg->nama }}</span>
                             @endforeach
                         </td>
                         @if (auth()->user()->role === 'admin')
-                            <td class="px-3 py-3 text-center">
+                            <td class="px-3 py-3 text-center td-aksi">
                                 <button type="button" class="btn btn-link btn-sm text-decoration-none p-0 me-3"
                                     onclick="openEditModal({{ $j->id }})">Edit</button>
 
@@ -233,9 +249,7 @@
                                 <select name="ruang_sidang" required class="form-select">
                                     <option value="" disabled selected>Pilih Ruang</option>
                                     <option>Ruang Sidang Persiapan</option>
-                                    <option>Ruang Sidang I</option>
-                                    <option>Ruang Sidang II</option>
-                                    <option>Ruang Sidang III</option>
+                                    <option>Ruang Sidang</option>
                                 </select>
                             </div>
                         </div>
@@ -352,7 +366,7 @@
                                 <div class="col-md-4">
                                     <label class="form-label fw-semibold small text-dark">Ruang Sidang</label>
                                     <select name="ruang_sidang" required class="form-select">
-                                        @foreach (['Ruang Sidang Persiapan', 'Ruang Sidang I', 'Ruang Sidang II', 'Ruang Sidang III'] as $ruang)
+                                        @foreach (['Ruang Sidang Persiapan', 'Ruang Sidang'] as $ruang)
                                             <option {{ $j->ruang_sidang === $ruang ? 'selected' : '' }}>{{ $ruang }}</option>
                                         @endforeach
                                     </select>

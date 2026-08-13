@@ -5,6 +5,61 @@
 @section('content')
 
 <style>
+    .role-badge {
+        background:#fff;
+        border:1px solid #ececec;
+        border-radius:.9rem;
+        padding:.55rem 1rem .55rem .6rem;
+        box-shadow:0 1px 2px rgba(0,0,0,.04);
+    }
+    .role-badge-icon {
+        width:32px;
+        height:32px;
+        border-radius:50%;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-size:.9rem;
+        flex-shrink:0;
+    }
+    .role-badge-name {
+        display:block;
+        font-size:.85rem;
+        font-weight:600;
+        color:#1f2937;
+        line-height:1.2;
+    }
+    .role-badge-role {
+        display:block;
+        font-size:.72rem;
+        font-weight:500;
+        line-height:1.2;
+    }
+    .filter-card {
+        background: #fff;
+        border: 1px solid #f1f1f1;
+        border-radius: .75rem;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, .04);
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .filter-card .form-label {
+        font-size: .78rem;
+        font-weight: 600;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: .03em;
+        margin-bottom: .4rem;
+    }
+    .btn-tampilkan {
+        background-color: #17375E;
+        border-color: #17375E;
+    }
+    .btn-tampilkan:hover {
+        background-color: #122c4b;
+        border-color: #122c4b;
+        color: #fff;
+    }
     .badge-soft {
         display: inline-flex;
         align-items: center;
@@ -78,26 +133,54 @@
     }
 </style>
 
-<div class="container-fluid px-4" style="max-width:1500px;">
+<div class="container-fluid px-4 pt-4" style="max-width:1500px;">
 
     {{-- Role badge --}}
-    <div class="mb-3">
-        <span class="d-inline-flex align-items-center gap-2 px-3 py-1.5 rounded-pill"
-            style="background:#f9fafb; border:1px solid #e5e7eb; font-size:.8rem; color:#374151;">
-            <span class="rounded-circle" style="width:7px; height:7px; background:{{ auth()->user()->role === 'admin' ? '#17375E' : '#E4B028' }};"></span>
-            Masuk sebagai <strong>{{ auth()->user()->nama }}</strong>
-            &middot; {{ auth()->user()->role === 'admin' ? 'Administrator' : 'Front Office' }}
-        </span>
+    <div class="mb-4">
+        <div class="d-inline-flex align-items-center gap-2 role-badge">
+            <span class="role-badge-icon" style="background:{{ auth()->user()->role === 'admin' ? 'rgba(23,55,94,.1)' : 'rgba(228,176,40,.15)' }};">
+                <i class="bi bi-person-fill" style="color:{{ auth()->user()->role === 'admin' ? '#17375E' : '#B8860B' }};"></i>
+            </span>
+            <div>
+                <span class="role-badge-name">{{ auth()->user()->nama }}</span>
+                <span class="role-badge-role" style="color:{{ auth()->user()->role === 'admin' ? '#17375E' : '#B8860B' }};">
+                    {{ auth()->user()->role === 'admin' ? 'Administrator' : 'Front Office' }}
+                </span>
+            </div>
+        </div>
     </div>
 
     {{-- Header --}}
-    <div class="d-flex align-items-start justify-content-between mb-4 flex-wrap gap-2">
-        <div>
-            <h1 class="h3 fw-bold text-dark mb-1">Jadwal Sidang Hari Ini</h1>
-            <p class="text-secondary small mb-0">
-                {{ \Carbon\Carbon::today()->format('d M Y') }} &middot; Toleransi kehadiran 15 menit dari jadwal
-            </p>
-        </div>
+    <div class="mb-4">
+        <h1 class="h3 fw-bold text-dark mb-1">
+            @if ($tanggal->isToday())
+                Jadwal Sidang Hari Ini
+            @else
+                Jadwal Sidang
+            @endif
+        </h1>
+        <p class="text-secondary small mb-0">
+            {{ $tanggal->format('d M Y') }} &middot; Toleransi kehadiran 15 menit dari jadwal
+        </p>
+    </div>
+
+    {{-- Filter tanggal, gaya sama seperti halaman publik Jadwal Sidang --}}
+    <div class="filter-card">
+        <form method="GET" action="{{ route('dashboard.index') }}" class="d-flex align-items-end gap-3 flex-wrap">
+            <div>
+                <label class="form-label">Pilih Tanggal Sidang</label>
+                <input type="date" name="tanggal" value="{{ $tanggal->format('Y-m-d') }}" class="form-control">
+            </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-tampilkan d-flex align-items-center gap-2 text-white">
+                    <i class="bi bi-arrow-repeat"></i>
+                    Tampilkan
+                </button>
+                @if (!$tanggal->isToday())
+                    <a href="{{ route('dashboard.index') }}" class="btn btn-outline-secondary">Hari Ini</a>
+                @endif
+            </div>
+        </form>
     </div>
 
     {{-- Summary cards --}}
@@ -146,7 +229,7 @@
                     @php $status = $j->statusRingkasan(); @endphp
                     <tr style="border-top:1px solid #f1f1f1;">
                         <td class="px-4 py-4 text-secondary">{{ $i + 1 }}</td>
-                        <td class="px-4 py-4 fw-semibold text-dark">{{ $j->perkara->nomor_perkara }}</td>
+                        <td class="px-4 py-4 fw-semibold text-dark">{{ $j->perkara?->nomor_perkara ?? '-' }}</td>
                         <td class="px-4 py-4 fw-medium">{{ substr($j->jam_sidang, 0, 5) }}</td>
                         <td class="px-4 py-4">{{ $j->ruang_sidang }}</td>
                         <td class="px-4 py-4">
@@ -183,8 +266,8 @@
 
                 <div class="modal-header border-0 pb-0">
                     <div>
-                        <h2 class="h5 fw-bold text-dark mb-0">{{ $j->perkara->nomor_perkara }}</h2>
-                        <p class="text-secondary small mb-0">{{ $j->perkara->agenda }}</p>
+                        <h2 class="h5 fw-bold text-dark mb-0">{{ $j->perkara?->nomor_perkara ?? '-' }}</h2>
+                        <p class="text-secondary small mb-0">{{ $j->perkara?->agenda ?? '-' }}</p>
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -231,13 +314,13 @@
                         <h3 class="fw-bold text-dark text-uppercase mb-3" style="font-size:.75rem; letter-spacing:.03em;">Para Pihak</h3>
                         <div class="mb-2">
                             <p class="text-secondary small mb-1">Penggugat</p>
-                            @foreach ($j->perkara->pihak->where('tipe', 'penggugat') as $pg)
+                            @foreach (($j->perkara?->pihak ?? collect())->where('tipe', 'penggugat') as $pg)
                                 <span class="pihak-pill">{{ $pg->nama }}</span>
                             @endforeach
                         </div>
                         <div class="mb-2">
                             <p class="text-secondary small mb-1">Tergugat</p>
-                            @foreach ($j->perkara->pihak->where('tipe', 'tergugat') as $tg)
+                            @foreach (($j->perkara?->pihak ?? collect())->where('tipe', 'tergugat') as $tg)
                                 <span class="pihak-pill">{{ $tg->nama }}</span>
                             @endforeach
                         </div>
@@ -245,7 +328,7 @@
 
                 </div>
 
-                <div class="px-6 py-4 border-top d-flex justify-content-end">
+                <div class="modal-footer border-0 pt-0">
                     <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">
                         Tutup
                     </button>

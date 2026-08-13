@@ -3,25 +3,24 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\JadwalSidang;
 use App\Models\Kehadiran;
-use Illuminate\Http\Request;
 
 class KehadiranController extends Controller
 {
     public function index()
     {
-        // Satu baris per pihak (Penggugat/Tergugat), bukan per jadwal — supaya
-        // perkara dengan banyak Penggugat/Tergugat tetap semuanya tertampil.
-        $kehadiranList = Kehadiran::with(['jadwalSidang.perkara', 'pihak'])
-            ->whereHas('jadwalSidang')
+        // Satu baris per jadwal sidang. Kalau ada beberapa Penggugat/Tergugat,
+        // semuanya ditumpuk di dalam kolom Penggugat/Tergugat yang sama —
+        // bukan bikin kolom atau baris baru.
+        $jadwalList = JadwalSidang::withFullDetail()
+            ->orderBy('tanggal_sidang')
+            ->orderBy('jam_sidang')
             ->get()
-            ->sortBy([
-                fn ($a, $b) => $a->jadwalSidang->tanggal_sidang <=> $b->jadwalSidang->tanggal_sidang,
-                fn ($a, $b) => $a->jadwalSidang->jam_sidang <=> $b->jadwalSidang->jam_sidang,
-            ])
+            ->filter(fn ($j) => $j->perkara !== null)
             ->values();
 
-        return view('kehadiran.kehadiran', compact('kehadiranList'));
+        return view('kehadiran.kehadiran', compact('jadwalList'));
     }
 
     // Hanya bisa dipanggil oleh Front Office — Admin ditolak di server,

@@ -14,19 +14,29 @@ class Perkara extends Model
         'agenda',
     ];
 
-    public function pihakPerkara(): HasMany
+    // Relasi utama — dipakai di semua halaman admin (Dashboard, Kelola Jadwal,
+    // Kehadiran, Perkara).
+    public function pihak(): HasMany
     {
         return $this->hasMany(PihakPerkara::class, 'perkara_id');
     }
 
+    // Alias — dipakai oleh view guest.jadwal (dibuat sebelum model ini ada).
+    // JANGAN hapus salah satu dari dua method ini; keduanya harus tetap ada
+    // supaya kedua sisi (admin & guest) sama-sama jalan.
+    public function pihakPerkara(): HasMany
+    {
+        return $this->pihak();
+    }
+
     public function penggugat(): HasMany
     {
-        return $this->pihakPerkara()->where('tipe', 'penggugat');
+        return $this->pihak()->where('tipe', 'penggugat');
     }
 
     public function tergugat(): HasMany
     {
-        return $this->pihakPerkara()->where('tipe', 'tergugat');
+        return $this->pihak()->where('tipe', 'tergugat');
     }
 
     public function jadwalSidang(): HasMany
