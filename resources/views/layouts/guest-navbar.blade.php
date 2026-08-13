@@ -16,7 +16,7 @@
                 </div>
 
                 <div class="brand-sub-title">
-                    PT TUN Jakarta (V 1.0)
+                    PT TUN Jakarta
                 </div>
 
             </div>
@@ -114,19 +114,19 @@
     }
 
     .logo-box img {
-        width: 64px;
+        width: 48px;
         display: flex;
     }
 
     .brand-title {
-        font-size: 2rem;
+        font-size: 1.5rem;
         font-weight: 700;
         color: var(--navy);
         letter-spacing: .5px;
     }
 
     .brand-sub-title {
-        font-size: 18px;
+        font-size: 14px;
         color: var(--gold);
         font-weight: 600;
     }

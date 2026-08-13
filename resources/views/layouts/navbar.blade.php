@@ -112,20 +112,19 @@
     }
 
     .logo-box img{
-        width: 64px;
+        width: 48px;
         display: flex;
     }
 
     .brand-title {
-        /* font-family: 'Source Serif 4', serif; */
-        font-size: 2rem;
+        font-size: 1.5rem;
         font-weight: 700;
         color: var(--navy);
         letter-spacing: .5px;
     }
 
     .brand-sub-title {
-        font-size: 18px;
+        font-size: 14px;
         color: var(--gold);
         font-weight: 600;
     }
