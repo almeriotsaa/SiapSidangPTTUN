@@ -9,8 +9,19 @@
         width: 100%;
         max-width: 1700px;
         margin: auto;
-        padding-inline: 45px;
+        padding-inline: 16px;
     }
+    @media (min-width: 576px) {
+        .page-container {
+            padding-inline: 24px;
+        }
+    }
+    @media (min-width: 992px) {
+        .page-container {
+            padding-inline: 45px;
+        }
+    }
+
     .table-card {
         background:#fff;
         border:1px solid #f1f1f1;
@@ -65,7 +76,7 @@
     }
 </style>
 
-<section class="py-5">
+<section class="py-4 py-lg-5">
     <div class="page-container">
 
         {{-- Header --}}
@@ -97,6 +108,7 @@
 
         {{-- Table --}}
         <div class="table-card">
+            <div class="table-responsive">
             <table class="table table-borderless mb-0">
                 <thead>
                     <tr>
@@ -124,7 +136,7 @@
                                     <span class="pihak-pill">{{ $tg->nama }}</span>
                                 @endforeach
                             </td>
-                            <td class="px-3 py-3 text-center">
+                            <td class="px-3 py-3 text-center text-nowrap">
                                 <button type="button" class="btn btn-link btn-sm text-decoration-none p-0 me-3"
                                     onclick="openEditModal({{ $p->id }})">Edit</button>
                                 <form id="deletePerkaraForm{{ $p->id }}" method="POST" action="{{ route('perkara.destroy', $p->id) }}" class="d-none">
@@ -146,6 +158,7 @@
                     @endforelse
                 </tbody>
             </table>
+            </div>
         </div>
 
     </div>

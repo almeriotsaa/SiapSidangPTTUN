@@ -35,60 +35,54 @@
 
             <ul class="navbar-nav ms-auto align-items-lg-center">
 
+            <li class="nav-item">
+                <a class="nav-link {{ request()->is('dashboard*') ? 'active' : '' }}"
+                    href="/dashboard">
+                    Dashboard
+                </a>
+            </li>
+
+            @if (auth()->user()->role === 'admin')
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->is('dashboard*') ? 'active' : '' }}"
-                        href="/dashboard">
-                        Dashboard
+                    <a class="nav-link {{ request()->is('perkara*') ? 'active' : '' }}"
+                        href="/perkara">
+                        Perkara
                     </a>
                 </li>
+            @endif
 
-                @if (auth()->user()->role === 'admin')
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->is('perkara*') ? 'active' : '' }}"
-                            href="/perkara">
-                            Perkara
-                        </a>
-                    </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->is('kelola*') ? 'active' : '' }}"
+                    href="/kelola-jadwal">
+                    Jadwal Sidang
+                </a>
+            </li>
 
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->is('hakim*') ? 'active' : '' }}"
-                            href="/hakim">
-                            Hakim/PP
-                        </a>
-                    </li>
-                @endif
+            <li class="nav-item">
+                <a class="nav-link {{ request()->is('kehadiran*') ? 'active' : '' }}"
+                    href="/kehadiran">
+                    Kehadiran
+                </a>
+            </li>
 
+            @if (auth()->user()->role === 'admin')
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->is('kelola*') ? 'active' : '' }}"
-                        href="/kelola-jadwal">
-                        Jadwal Sidang
+                    <a class="nav-link {{ request()->is('hakim*') ? 'active' : '' }}"
+                        href="/hakim">
+                        Hakim/PP
                     </a>
                 </li>
+            @endif
 
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->is('kehadiran*') ? 'active' : '' }}"
-                        href="/kehadiran">
-                        Kehadiran
-                    </a>
-                </li>
+            <li class="nav-item ms-lg-2">
+                <button type="button" class="btn-keanggotaan btn-logout-danger"
+                    data-bs-toggle="modal" data-bs-target="#logoutConfirmModal">
+                    <i class="bi bi-box-arrow-right me-2"></i>
+                    Log out
+                </button>
+            </li>
 
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->is('riwayat*') ? 'active' : '' }}"
-                        href="/riwayat">
-                        Riwayat
-                    </a>
-                </li>
-
-                <li class="nav-item ms-lg-2">
-                    <button type="button" class="btn-keanggotaan btn-logout-danger"
-                        data-bs-toggle="modal" data-bs-target="#logoutConfirmModal">
-                        <i class="bi bi-box-arrow-right me-2"></i>
-                        Log out
-                    </button>
-                </li>
-
-            </ul>
-
+        </ul>
         </div>
 
     </div>

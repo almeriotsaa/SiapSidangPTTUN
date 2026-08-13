@@ -28,6 +28,10 @@
         font-weight:600;
         color:#1f2937;
         line-height:1.2;
+        max-width:180px;
+        overflow:hidden;
+        text-overflow:ellipsis;
+        white-space:nowrap;
     }
     .role-badge-role {
         display:block;
@@ -124,12 +128,19 @@
 
     .pihak-pill {
         display:inline-block;
-        background:#f3f4f6;
-        color:#374151;
         border-radius:.4rem;
         padding:2px 8px;
         font-size:.75rem;
         margin:1px 3px 1px 0;
+    }
+    .pihak-pill-hadir {
+        background:#f0fdf4; color:#15803d;
+    }
+    .pihak-pill-belum {
+        background:#fef2f2; color:#dc2626;
+    }
+    .pihak-pill-tidak {
+        background:#f3f4f6; color:#4b5563;
     }
 </style>
 
@@ -166,18 +177,19 @@
 
     {{-- Filter tanggal, gaya sama seperti halaman publik Jadwal Sidang --}}
     <div class="filter-card">
-        <form method="GET" action="{{ route('dashboard.index') }}" class="d-flex align-items-end gap-3 flex-wrap">
-            <div>
+        <form method="GET" action="{{ route('dashboard.index') }}"
+            class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-end gap-3">
+            <div class="w-100" style="max-width:220px;">
                 <label class="form-label">Pilih Tanggal Sidang</label>
                 <input type="date" name="tanggal" value="{{ $tanggal->format('Y-m-d') }}" class="form-control">
             </div>
-            <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-tampilkan d-flex align-items-center gap-2 text-white">
+            <div class="d-flex flex-column flex-sm-row gap-2">
+                <button type="submit" class="btn btn-tampilkan d-flex align-items-center justify-content-center gap-2 text-white">
                     <i class="bi bi-arrow-repeat"></i>
                     Tampilkan
                 </button>
                 @if (!$tanggal->isToday())
-                    <a href="{{ route('dashboard.index') }}" class="btn btn-outline-secondary">Hari Ini</a>
+                    <a href="{{ route('dashboard.index') }}" class="btn btn-outline-secondary text-center">Hari Ini</a>
                 @endif
             </div>
         </form>
@@ -213,6 +225,7 @@
 
     {{-- Table --}}
     <div class="table-card">
+        <div class="table-responsive">
         <table class="table table-borderless mb-0">
             <thead>
                 <tr>
@@ -254,6 +267,7 @@
                 @endforelse
             </tbody>
         </table>
+        </div>
     </div>
 
 </div>
@@ -312,16 +326,35 @@
 
                     <div class="pt-3 mt-3 border-top">
                         <h3 class="fw-bold text-dark text-uppercase mb-3" style="font-size:.75rem; letter-spacing:.03em;">Para Pihak</h3>
+                        @php $lewatBatas = $j->sudahLewatBatas(); @endphp
                         <div class="mb-2">
                             <p class="text-secondary small mb-1">Penggugat</p>
                             @foreach (($j->perkara?->pihak ?? collect())->where('tipe', 'penggugat') as $pg)
-                                <span class="pihak-pill">{{ $pg->nama }}</span>
+                                @php
+                                    $k = $j->kehadiran->firstWhere('pihak_perkara_id', $pg->id);
+                                    $statusClass = 'pihak-pill-tidak';
+                                    if ($k && $k->status === 'Hadir') {
+                                        $statusClass = 'pihak-pill-hadir';
+                                    } elseif (!$lewatBatas) {
+                                        $statusClass = 'pihak-pill-belum';
+                                    }
+                                @endphp
+                                <span class="pihak-pill {{ $statusClass }}">{{ $pg->nama }}</span>
                             @endforeach
                         </div>
                         <div class="mb-2">
                             <p class="text-secondary small mb-1">Tergugat</p>
                             @foreach (($j->perkara?->pihak ?? collect())->where('tipe', 'tergugat') as $tg)
-                                <span class="pihak-pill">{{ $tg->nama }}</span>
+                                @php
+                                    $k = $j->kehadiran->firstWhere('pihak_perkara_id', $tg->id);
+                                    $statusClass = 'pihak-pill-tidak';
+                                    if ($k && $k->status === 'Hadir') {
+                                        $statusClass = 'pihak-pill-hadir';
+                                    } elseif (!$lewatBatas) {
+                                        $statusClass = 'pihak-pill-belum';
+                                    }
+                                @endphp
+                                <span class="pihak-pill {{ $statusClass }}">{{ $tg->nama }}</span>
                             @endforeach
                         </div>
                     </div>
