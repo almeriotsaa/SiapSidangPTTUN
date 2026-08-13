@@ -15,6 +15,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => CheckRole::class,
         ]);
+
+        // Railway terminates TLS at its edge proxy and forwards plain HTTP to
+        // the container, so Laravel must trust the X-Forwarded-* headers to
+        // know the original request was HTTPS (otherwise it generates
+        // http:// URLs, e.g. form actions, triggering mixed-content warnings).
+        $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

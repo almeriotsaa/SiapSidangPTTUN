@@ -8,7 +8,6 @@ use App\Http\Controllers\Admin\PaniteraController;
 use App\Http\Controllers\Admin\PerkaraController;
 use App\Http\Controllers\Admin\JadwalSidangController as AdminJadwalSidangController;
 use App\Http\Controllers\Admin\KehadiranController;
-use App\Http\Controllers\Admin\RiwayatController;
 use App\Http\Controllers\Admin\DashboardController;
 
 // ============================
@@ -46,8 +45,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/kelola-jadwal', [AdminJadwalSidangController::class, 'store'])->name('kelola-jadwal.store');
     Route::put('/kelola-jadwal/{jadwal}', [AdminJadwalSidangController::class, 'update'])->name('kelola-jadwal.update');
     Route::delete('/kelola-jadwal/{jadwal}', [AdminJadwalSidangController::class, 'destroy'])->name('kelola-jadwal.destroy');
-
-    Route::get('/riwayat', [RiwayatController::class, 'index'])->name('riwayat.index');
 
     Route::middleware('role:admin')->group(function () {
 
