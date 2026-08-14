@@ -77,9 +77,12 @@
     }
 
     .btn-tandai-hadir {
-        font-size:.72rem;
-        padding:.2rem .6rem;
-        border-radius:999px;
+        font-size: .85rem;
+        font-weight: 700;
+        padding: .4rem .9rem;
+        border-radius: .7rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,.1);
+        letter-spacing: .02em;
     }
 </style>
 

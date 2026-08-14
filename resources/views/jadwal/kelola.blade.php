@@ -96,9 +96,8 @@
             </p>
         </div>
         @if (auth()->user()->role === 'admin')
-            <button onclick="openAddModal()" type="button"
-                class="btn btn-primary d-flex align-items-center gap-2">
-                <span class="fs-5 lh-1">+</span> Tambah Jadwal
+            <button onclick="openAddModal()" type="button" class="btn d-flex align-items-center gap-2" style="background-color: #000080; color: #fff;">
+            <span class="fs-5 lh-1">+</span> Tambah Jadwal
             </button>
         @endif
     </div>
