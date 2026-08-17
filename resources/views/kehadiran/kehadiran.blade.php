@@ -41,7 +41,7 @@
 
     .pihak-row {
         display:flex;
-        align-items:flex-start;
+        align-items:center;
         gap:8px;
         margin-bottom:6px;
     }
@@ -53,7 +53,6 @@
         flex:0 0 110px;
         white-space:normal;
         word-break:break-word;
-        padding-top:2px;
     }
 
     .badge-status {
@@ -77,12 +76,13 @@
     }
 
     .btn-tandai-hadir {
-        font-size: .85rem;
-        font-weight: 700;
-        padding: .4rem .9rem;
-        border-radius: .7rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,.1);
+        font-size: .75rem;
+        /* font-weight: 600; */
+        padding: 4px 10px;
+        border-radius: 999px;
+        box-shadow: 0 1px 2px rgba(0,0,0,.05);
         letter-spacing: .02em;
+        transition: all 0.2s ease-in-out;
     }
 </style>
 
@@ -136,7 +136,7 @@
                             <td class="px-3 py-3 fw-medium">{{ substr($j->jam_sidang, 0, 5) }}</td>
                             <td class="px-3 py-3">{{ $j->ruang_sidang }}</td>
 
-                            {{-- Kolom Penggugat: semua pihak ditumpuk di sini, bukan kolom baru --}}
+                            {{-- Kolom Penggugat --}}
                             <td class="px-3 py-3">
                                 @forelse ($penggugatList as $k)
                                     @php
@@ -144,26 +144,27 @@
                                     @endphp
                                     <div class="pihak-row">
                                         <span class="pihak-nama">{{ $k->pihak->nama }}</span>
-                                        @if ($k->status === 'Hadir')
-                                            <span class="badge-status badge-status-hadir">&#9679; Hadir</span>
-                                        @elseif ($lewatBatas)
-                                            <span class="badge-status badge-status-tidak-hadir">&#9679; Tidak Hadir</span>
-                                        @elseif ($bisaTandaiHadir)
-                                            <span class="badge-status badge-status-belum-hadir">&#9679; Belum Hadir</span>
-                                            <form method="POST" action="{{ route('kehadiran.tandai-hadir', $k->id) }}" class="d-inline">
-                                                @csrf
-                                                <button type="submit" class="btn btn-success btn-tandai-hadir">Hadir</button>
-                                            </form>
-                                        @else
-                                            <span class="badge-status badge-status-belum-hadir">&#9679; Belum Hadir</span>
-                                        @endif
+                                        <span id="status-container-{{ $k->id }}">
+                                            @if ($k->status === 'Hadir')
+                                                <span class="badge-status badge-status-hadir">&#9679; Hadir</span>
+                                            @elseif ($lewatBatas)
+                                                <span class="badge-status badge-status-tidak-hadir">&#9679; Tidak Hadir</span>
+                                            @elseif ($bisaTandaiHadir)
+                                                <form action="{{ route('kehadiran.tandai-hadir', $k->id) }}" class="d-inline form-tandai-hadir">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-success btn-tandai-hadir">Hadir</button>
+                                                </form>
+                                            @else
+                                                <span class="badge-status badge-status-belum-hadir">&#9679; Belum Hadir</span>
+                                            @endif
+                                        </span>
                                     </div>
                                 @empty
                                     <span class="text-secondary">-</span>
                                 @endforelse
                             </td>
 
-                            {{-- Kolom Tergugat: sama, ditumpuk di dalam satu kolom --}}
+                            {{-- Kolom Tergugat --}}
                             <td class="px-3 py-3">
                                 @forelse ($tergugatList as $k)
                                     @php
@@ -171,19 +172,20 @@
                                     @endphp
                                     <div class="pihak-row">
                                         <span class="pihak-nama">{{ $k->pihak->nama }}</span>
-                                        @if ($k->status === 'Hadir')
-                                            <span class="badge-status badge-status-hadir">&#9679; Hadir</span>
-                                        @elseif ($lewatBatas)
-                                            <span class="badge-status badge-status-tidak-hadir">&#9679; Tidak Hadir</span>
-                                        @elseif ($bisaTandaiHadir)
-                                            <span class="badge-status badge-status-belum-hadir">&#9679; Belum Hadir</span>
-                                            <form method="POST" action="{{ route('kehadiran.tandai-hadir', $k->id) }}" class="d-inline">
-                                                @csrf
-                                                <button type="submit" class="btn btn-success btn-tandai-hadir">Hadir</button>
-                                            </form>
-                                        @else
-                                            <span class="badge-status badge-status-belum-hadir">&#9679; Belum Hadir</span>
-                                        @endif
+                                        <span id="status-container-{{ $k->id }}">
+                                            @if ($k->status === 'Hadir')
+                                                <span class="badge-status badge-status-hadir">&#9679; Hadir</span>
+                                            @elseif ($lewatBatas)
+                                                <span class="badge-status badge-status-tidak-hadir">&#9679; Tidak Hadir</span>
+                                            @elseif ($bisaTandaiHadir)
+                                                <form action="{{ route('kehadiran.tandai-hadir', $k->id) }}" class="d-inline form-tandai-hadir">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-success btn-tandai-hadir">Hadir</button>
+                                                </form>
+                                            @else
+                                                <span class="badge-status badge-status-belum-hadir">&#9679; Belum Hadir</span>
+                                            @endif
+                                        </span>
                                     </div>
                                 @empty
                                     <span class="text-secondary">-</span>
@@ -203,5 +205,72 @@
 
     </div>
 </section>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        // Intercept form submit agar tidak reload halaman (Smooth Click via AJAX)
+        document.querySelectorAll('.form-tandai-hadir').forEach(form => {
+            form.addEventListener('submit', function (e) {
+                e.preventDefault(); // Mencegah reload halaman penuh
+
+                const container = this.closest('span[id^="status-container-"]');
+                const button = this.querySelector('button');
+
+                // Mencegah klik ganda
+                button.disabled = true;
+                button.innerText = '...';
+
+                fetch(this.action, {
+                    method: 'POST',
+                    body: new FormData(this),
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        if (container) {
+                            container.innerHTML = '<span class="badge-status badge-status-hadir">&#9679; Hadir</span>';
+                        }
+                    } else {
+                        button.disabled = false;
+                        button.innerText = 'Hadir';
+                        alert('Gagal menandai kehadiran. Silakan coba lagi.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    button.disabled = false;
+                    button.innerText = 'Hadir';
+                });
+            });
+        });
+
+        // Event listener WebSockets (Tetap aktif untuk sinkronisasi antar layar/device)
+        if (typeof window.Echo !== 'undefined') {
+            
+            // 1. Refresh otomatis jika Admin menambah/mengubah Jadwal Sidang
+            window.Echo.channel('jadwal-sidang-channel')
+                .listen('.jadwal.updated', function (e) {
+                    console.log('Ada pembaruan jadwal sidang, merefresh halaman kehadiran...');
+                    window.location.reload();
+                });
+
+            // 2. Real-time update jika ada user/device lain yang klik tombol Hadir
+            window.Echo.channel('kehadiran-channel')
+                .listen('.kehadiran.updated', function (e) {
+                    console.log('Update kehadiran diterima:', e);
+
+                    const container = document.getElementById('status-container-' + e.kehadiran.id);
+                    if (container) {
+                        container.innerHTML = '<span class="badge-status badge-status-hadir">&#9679; Hadir</span>';
+                    }
+                });
+        }
+    });
+</script>
+@endpush
 
 @endsection

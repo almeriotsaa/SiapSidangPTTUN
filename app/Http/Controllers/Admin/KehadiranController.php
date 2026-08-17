@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\JadwalSidang;
 use App\Models\Kehadiran;
+use App\Events\KehadiranUpdated;
 
 class KehadiranController extends Controller
 {
@@ -44,6 +45,10 @@ class KehadiranController extends Controller
             'waktu_hadir' => now(),
         ]);
 
+        broadcast(new KehadiranUpdated($kehadiran))->toOthers();
+
         return back()->with('success', 'Kehadiran berhasil ditandai.');
     }
+
+    
 }

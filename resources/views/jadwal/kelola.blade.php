@@ -97,7 +97,7 @@
         </div>
         @if (auth()->user()->role === 'admin')
             <button onclick="openAddModal()" type="button" class="btn d-flex align-items-center gap-2" style="background-color: #000080; color: #fff;">
-            <span class="fs-5 lh-1">+</span> Tambah Jadwal
+                <span class="fs-5 lh-1">+</span> Tambah Jadwal
             </button>
         @endif
     </div>
@@ -196,7 +196,7 @@
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content rounded-4">
                 <div class="modal-header border-0 pb-0">
-                    <h2 class="h5 fw-bold text-dark mb-0">Tambah Jadwal Sidang</h2>
+                    <h5 class="fw-bold text-dark mb-0">Tambah Jadwal Sidang</h5>
                     <button type="button" class="btn-close" onclick="closeAddModal()" aria-label="Close"></button>
                 </div>
 
@@ -307,13 +307,13 @@
         </div>
     </div>
 
-    {{-- Modal Edit Jadwal — satu per baris, pre-filled dari server --}}
+    {{-- Modal Edit Jadwal --}}
     @foreach ($jadwalList as $j)
         <div class="modal fade" id="editJadwalModal{{ $j->id }}" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content rounded-4">
                     <div class="modal-header border-0 pb-0">
-                        <h2 class="h5 fw-bold text-dark mb-0">Edit Jadwal Sidang</h2>
+                        <h5 class="fw-bold text-dark mb-0">Edit Jadwal Sidang</h5>
                         <button type="button" class="btn-close" onclick="closeEditModal({{ $j->id }})" aria-label="Close"></button>
                     </div>
 
@@ -443,94 +443,127 @@
 
 </section>
 
+@if (auth()->user()->role === 'admin')
 <script>
-    @if (auth()->user()->role === 'admin')
-        // Data perkara lengkap (termasuk pihak/penggugat/tergugat & agenda) untuk logic autofill JS
-        const perkaraOptions = @json($perkaraList);
+    const perkaraOptions = @json($perkaraList);
+    const jadwalIds = @json($jadwalList->pluck('id'));
+    const hasErrors = @json($errors->any());
 
-        let addModalInstance = null;
-        const editModalInstances = {};
-        let deleteModalInstance = null;
-        let formToDelete = null;
+    let addModalInstance = null;
+    const editModalInstances = {};
+    let deleteModalInstance = null;
+    let formToDelete = null;
 
-        document.addEventListener('DOMContentLoaded', function () {
-            addModalInstance = new bootstrap.Modal(document.getElementById('addJadwalModal'));
-            deleteModalInstance = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+    document.addEventListener('DOMContentLoaded', function () {
+        const addModalEl = document.getElementById('addJadwalModal');
+        if (addModalEl) {
+            addModalInstance = new bootstrap.Modal(addModalEl);
+        }
 
-            @foreach ($jadwalList as $j)
-                editModalInstances[{{ $j->id }}] = new bootstrap.Modal(document.getElementById('editJadwalModal{{ $j->id }}'));
-            @endforeach
+        const deleteModalEl = document.getElementById('deleteConfirmModal');
+        if (deleteModalEl) {
+            deleteModalInstance = new bootstrap.Modal(deleteModalEl);
+        }
 
-            @if ($errors->any())
-                addModalInstance.show();
-            @endif
-
-            // Isi tampilan autofill untuk semua modal Edit sesuai perkara yang sedang tersimpan
-            @foreach ($jadwalList as $j)
-                handlePerkaraChange('edit{{ $j->id }}');
-            @endforeach
+        jadwalIds.forEach(function (id) {
+            const editModalEl = document.getElementById('editJadwalModal' + id);
+            if (editModalEl) {
+                editModalInstances[id] = new bootstrap.Modal(editModalEl);
+            }
         });
 
-        // suffix contoh: 'add' -> elemen id f_perkara_add, f_penggugat_display_add, dst
-        // atau 'edit123' -> elemen id f_perkara_edit123, f_penggugat_display_edit123, dst
-        function handlePerkaraChange(suffix) {
-            const select = document.getElementById('f_perkara_' + suffix);
-            const selectedId = parseInt(select.value, 10);
-            const data = perkaraOptions.find(p => p.id === selectedId);
+        if (hasErrors && addModalInstance) {
+            addModalInstance.show();
+        }
 
-            const penggugatDisplay = document.getElementById('f_penggugat_display_' + suffix);
-            const tergugatDisplay = document.getElementById('f_tergugat_display_' + suffix);
-            const agendaDisplay = document.getElementById('f_agenda_display_' + suffix);
+        jadwalIds.forEach(function (id) {
+            handlePerkaraChange('edit' + id);
+        });
+    });
 
-            if (data) {
-                const penggugatNames = data.pihak.filter(p => p.tipe === 'penggugat').map(p => p.nama).join(', ');
-                const tergugatNames = data.pihak.filter(p => p.tipe === 'tergugat').map(p => p.nama).join(', ');
+    function handlePerkaraChange(suffix) {
+        const select = document.getElementById('f_perkara_' + suffix);
+        if (!select) return;
 
+        const selectedId = parseInt(select.value, 10);
+        const data = perkaraOptions.find(p => p.id === selectedId);
+
+        const penggugatDisplay = document.getElementById('f_penggugat_display_' + suffix);
+        const tergugatDisplay = document.getElementById('f_tergugat_display_' + suffix);
+        const agendaDisplay = document.getElementById('f_agenda_display_' + suffix);
+
+        if (data) {
+            const penggugatNames = data.pihak.filter(p => p.tipe === 'penggugat').map(p => p.nama).join(', ');
+            const tergugatNames = data.pihak.filter(p => p.tipe === 'tergugat').map(p => p.nama).join(', ');
+
+            if (penggugatDisplay) {
                 penggugatDisplay.textContent = penggugatNames || '-';
                 penggugatDisplay.classList.remove('is-empty');
-
+            }
+            if (tergugatDisplay) {
                 tergugatDisplay.textContent = tergugatNames || '-';
                 tergugatDisplay.classList.remove('is-empty');
-
+            }
+            if (agendaDisplay) {
                 agendaDisplay.textContent = data.agenda;
                 agendaDisplay.classList.remove('is-empty');
-            } else {
+            }
+        } else {
+            if (penggugatDisplay) {
                 penggugatDisplay.textContent = 'Pilih No. Perkara dulu';
                 penggugatDisplay.classList.add('is-empty');
-
+            }
+            if (tergugatDisplay) {
                 tergugatDisplay.textContent = 'Pilih No. Perkara dulu';
                 tergugatDisplay.classList.add('is-empty');
-
+            }
+            if (agendaDisplay) {
                 agendaDisplay.textContent = 'Pilih No. Perkara dulu';
                 agendaDisplay.classList.add('is-empty');
             }
         }
+    }
 
-        function openAddModal() {
-            addModalInstance.show();
-        }
-        function closeAddModal() {
-            addModalInstance.hide();
-        }
+    function openAddModal() {
+        if (addModalInstance) addModalInstance.show();
+    }
+    function closeAddModal() {
+        if (addModalInstance) addModalInstance.hide();
+    }
 
-        function openEditModal(id) {
-            editModalInstances[id].show();
-        }
-        function closeEditModal(id) {
-            editModalInstances[id].hide();
-        }
+    function openEditModal(id) {
+        if (editModalInstances[id]) editModalInstances[id].show();
+    }
+    function closeEditModal(id) {
+        if (editModalInstances[id]) editModalInstances[id].hide();
+    }
 
-        function askDelete(formId, message) {
-            formToDelete = document.getElementById(formId);
-            document.getElementById('deleteConfirmText').textContent = message;
-            deleteModalInstance.show();
+    function askDelete(formId, message) {
+        formToDelete = document.getElementById(formId);
+        const confirmTextEl = document.getElementById('deleteConfirmText');
+        if (confirmTextEl) confirmTextEl.textContent = message;
+        if (deleteModalInstance) deleteModalInstance.show();
+    }
+    function confirmDeleteSubmit() {
+        if (formToDelete) {
+            formToDelete.submit();
         }
-        function confirmDeleteSubmit() {
-            if (formToDelete) {
-                formToDelete.submit();
-            }
-        }
-    @endif
+    }
 </script>
+@endif
 
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        if (typeof window.Echo !== 'undefined') {
+            window.Echo.channel('jadwal-sidang-channel')
+                .listen('.jadwal.updated', function (e) {
+                    console.log('Ada pembaruan jadwal dari Admin, merefresh halaman...');
+                    window.location.reload();
+                });
+        }
+    });
+</script>
+@endpush
