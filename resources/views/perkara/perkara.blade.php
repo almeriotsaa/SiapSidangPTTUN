@@ -88,7 +88,7 @@
                 </p>
             </div>
             <button type="button" onclick="openAddModal()"
-                class="btn btn-primary d-flex align-items-center gap-2">
+                class="btn d-flex align-items-center gap-2" style="background-color: #000080; color: #fff;">
                 <span class="fs-5 lh-1">+</span> Buat Perkara
             </button>
         </div>

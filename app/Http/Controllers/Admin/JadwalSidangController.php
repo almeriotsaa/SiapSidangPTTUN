@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Events\JadwalSidangUpdated;
 use App\Http\Controllers\Controller;
 use App\Models\Hakim;
 use App\Models\JadwalSidang;
@@ -35,6 +36,9 @@ class JadwalSidangController extends Controller
             $this->buatKehadiranUntukPerkara($jadwal);
         });
 
+        // <-- 2. TRIGGER REAL-TIME EVENT SAAT TAMBAH JADWAL
+        broadcast(new JadwalSidangUpdated())->toOthers();
+
         return redirect()->route('kelola-jadwal.index')->with('success', 'Jadwal sidang berhasil ditambahkan.');
     }
 
@@ -55,6 +59,9 @@ class JadwalSidangController extends Controller
             }
         });
 
+        // <-- 3. TRIGGER REAL-TIME EVENT SAAT UPDATE JADWAL
+        broadcast(new JadwalSidangUpdated())->toOthers();
+
         return redirect()->route('kelola-jadwal.index')->with('success', 'Jadwal sidang berhasil diperbarui.');
     }
 
@@ -62,6 +69,9 @@ class JadwalSidangController extends Controller
     {
         // kehadiran terkait otomatis ikut terhapus (cascadeOnDelete di skema database)
         $jadwal->delete();
+
+        // <-- 4. TRIGGER REAL-TIME EVENT SAAT HAPUS JADWAL
+        broadcast(new JadwalSidangUpdated())->toOthers();
 
         return redirect()->route('kelola-jadwal.index')->with('success', 'Jadwal sidang berhasil dihapus.');
     }
