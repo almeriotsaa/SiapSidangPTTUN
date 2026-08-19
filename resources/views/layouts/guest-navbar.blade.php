@@ -23,9 +23,7 @@
 
         </a>
 
-        <button class="navbar-toggler"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarSIAP">
+        <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarSIAP">
 
             <span class="navbar-toggler-icon"></span>
 
@@ -36,29 +34,29 @@
             <ul class="navbar-nav ms-auto align-items-lg-center">
 
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->is('/') ? 'active' : '' }}"
-                        href="/">
+                    <a class="nav-link {{ request()->is('/') ? 'active' : '' }}" href="/">
                         Beranda
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->is('jadwal*') ? 'active' : '' }}"
-                        href="/jadwal">
+                    <a class="nav-link {{ request()->is('jadwal*') ? 'active' : '' }}" href="/jadwal">
                         Jadwal Sidang
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->is('tentang*') ? 'active' : '' }}"
-                        href="/tentang">
+                    <a class="nav-link {{ request()->is('tentang*') ? 'active' : '' }}" href="/tentang">
                         Tentang
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->is('kontak*') ? 'active' : '' }}"
-                        href="/kontak">
+                    <a class="nav-link" href="{{ route('kehadiran.index') }}">Kehadiran</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->is('kontak*') ? 'active' : '' }}" href="/kontak">
                         Kontak
                     </a>
                 </li>
@@ -66,10 +64,7 @@
                 <!-- Dropdown Keanggotaan -->
                 <li class="nav-item dropdown">
 
-                    <a class="btn-keanggotaan dropdown-toggle"
-                        href="#"
-                        role="button"
-                        data-bs-toggle="dropdown"
+                    <a class="btn-keanggotaan dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                         aria-expanded="false">
 
                         Keanggotaan
@@ -244,4 +239,5 @@
         }
 
     }
+
 </style>

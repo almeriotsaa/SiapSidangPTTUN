@@ -7,25 +7,21 @@ use App\Http\Controllers\Admin\HakimController;
 use App\Http\Controllers\Admin\PaniteraController;
 use App\Http\Controllers\Admin\PerkaraController;
 use App\Http\Controllers\Admin\JadwalSidangController as AdminJadwalSidangController;
-use App\Http\Controllers\Admin\KehadiranController;
+use App\Http\Controllers\Admin\KehadiranController; // Controller Kehadiran
 use App\Http\Controllers\Admin\DashboardController;
 
 // ============================
-// Halaman publik (tidak perlu login)
+// Halaman Publik (Guest, Front Office, & Admin)
 // ============================
-Route::get('/', function () {
-    return view('guest.home');
-});
-
+Route::get('/', function () { return view('guest.home'); });
 Route::get('/jadwal', [JadwalSidangController::class, 'index']);
+Route::get('/kontak', function () { return view('guest.kontak'); });
+Route::get('/tentang', function () { return view('guest.tentang'); });
 
-Route::get('/kontak', function () {
-    return view('guest.kontak');
-});
+// Route Kehadiran (Bisa diakses publik / tanpa login)
+Route::get('/kehadiran', [KehadiranController::class, 'index'])->name('kehadiran.index');
+Route::post('/kehadiran/{kehadiran}/hadir', [KehadiranController::class, 'tandaiHadir'])->name('kehadiran.tandai-hadir');
 
-Route::get('/tentang', function () {
-    return view('guest.tentang');
-});
 
 // ============================
 // Autentikasi
@@ -34,8 +30,9 @@ Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.attempt');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+
 // ============================
-// Halaman admin (WAJIB login)
+// Halaman Internal (Wajib Login FO & Admin)
 // ============================
 Route::middleware('auth')->group(function () {
 
@@ -46,8 +43,8 @@ Route::middleware('auth')->group(function () {
     Route::put('/kelola-jadwal/{jadwal}', [AdminJadwalSidangController::class, 'update'])->name('kelola-jadwal.update');
     Route::delete('/kelola-jadwal/{jadwal}', [AdminJadwalSidangController::class, 'destroy'])->name('kelola-jadwal.destroy');
 
+    // Khusus Admin
     Route::middleware('role:admin')->group(function () {
-
         Route::get('/perkara', [PerkaraController::class, 'index'])->name('perkara.index');
         Route::post('/perkara', [PerkaraController::class, 'store'])->name('perkara.store');
         Route::put('/perkara/{perkara}', [PerkaraController::class, 'update'])->name('perkara.update');
@@ -59,10 +56,6 @@ Route::middleware('auth')->group(function () {
 
         Route::post('/panitera', [PaniteraController::class, 'store'])->name('panitera.store');
         Route::delete('/panitera/{panitera}', [PaniteraController::class, 'destroy'])->name('panitera.destroy');
-
     });
-
-    Route::get('/kehadiran', [KehadiranController::class, 'index'])->name('kehadiran.index');
-    Route::post('/kehadiran/{kehadiran}/tandai-hadir', [KehadiranController::class, 'tandaiHadir'])->name('kehadiran.tandai-hadir');
 
 });
