@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends(auth()->check() ? 'layouts.admin' : 'layouts.guest')
 
 @section('title','Kehadiran')
 
@@ -77,7 +77,6 @@
 
     .btn-tandai-hadir {
         font-size: .75rem;
-        /* font-weight: 600; */
         padding: 4px 10px;
         border-radius: 999px;
         box-shadow: 0 1px 2px rgba(0,0,0,.05);
@@ -93,7 +92,8 @@
         <div class="mb-4">
             <h1 class="h3 fw-bold text-dark mb-1">Kehadiran</h1>
             <p class="text-secondary small mb-0">
-                @if (auth()->user()->role === 'admin')
+                {{-- 2. Aman Pengecekan Admin bagi Guest --}}
+                @if (auth()->check() && auth()->user()->role === 'admin')
                     Status kehadiran Penggugat &amp; Tergugat per jadwal sidang (tampilan saja — Admin tidak dapat mengubah status).
                 @else
                     Tandai kehadiran Penggugat dan Tergugat &middot; Status otomatis menjadi <strong>Tidak Hadir</strong> jika belum ditandai hadir 15 menit setelah jadwal sidang.
@@ -128,6 +128,9 @@
                             $lewatBatas = $j->sudahLewatBatas();
                             $penggugatList = $j->kehadiran->filter(fn ($k) => $k->pihak && $k->pihak->tipe === 'penggugat');
                             $tergugatList  = $j->kehadiran->filter(fn ($k) => $k->pihak && $k->pihak->tipe === 'tergugat');
+                            
+                            // Cek apakah user adalah Admin
+                            $isAdmin = auth()->check() && auth()->user()->role === 'admin';
                         @endphp
                         <tr style="border-top:1px solid #f1f1f1;">
                             <td class="px-3 py-3 text-secondary">{{ $i + 1 }}</td>
@@ -140,7 +143,8 @@
                             <td class="px-3 py-3">
                                 @forelse ($penggugatList as $k)
                                     @php
-                                        $bisaTandaiHadir = auth()->user()->role !== 'admin' && $k->status !== 'Hadir' && !$lewatBatas;
+                                        // Guest & FO (bukan Admin) BISA tandai hadir
+                                        $bisaTandaiHadir = !$isAdmin && $k->status !== 'Hadir' && !$lewatBatas;
                                     @endphp
                                     <div class="pihak-row">
                                         <span class="pihak-nama">{{ $k->pihak->nama }}</span>
@@ -150,7 +154,7 @@
                                             @elseif ($lewatBatas)
                                                 <span class="badge-status badge-status-tidak-hadir">&#9679; Tidak Hadir</span>
                                             @elseif ($bisaTandaiHadir)
-                                                <form action="{{ route('kehadiran.tandai-hadir', $k->id) }}" class="d-inline form-tandai-hadir">
+                                                <form action="{{ route('kehadiran.tandai-hadir', $k->id) }}" method="POST" class="d-inline form-tandai-hadir">
                                                     @csrf
                                                     <button type="submit" class="btn btn-success btn-tandai-hadir">Hadir</button>
                                                 </form>
@@ -168,7 +172,8 @@
                             <td class="px-3 py-3">
                                 @forelse ($tergugatList as $k)
                                     @php
-                                        $bisaTandaiHadir = auth()->user()->role !== 'admin' && $k->status !== 'Hadir' && !$lewatBatas;
+                                        // Guest & FO (bukan Admin) BISA tandai hadir
+                                        $bisaTandaiHadir = !$isAdmin && $k->status !== 'Hadir' && !$lewatBatas;
                                     @endphp
                                     <div class="pihak-row">
                                         <span class="pihak-nama">{{ $k->pihak->nama }}</span>
@@ -178,7 +183,7 @@
                                             @elseif ($lewatBatas)
                                                 <span class="badge-status badge-status-tidak-hadir">&#9679; Tidak Hadir</span>
                                             @elseif ($bisaTandaiHadir)
-                                                <form action="{{ route('kehadiran.tandai-hadir', $k->id) }}" class="d-inline form-tandai-hadir">
+                                                <form action="{{ route('kehadiran.tandai-hadir', $k->id) }}" method="POST" class="d-inline form-tandai-hadir">
                                                     @csrf
                                                     <button type="submit" class="btn btn-success btn-tandai-hadir">Hadir</button>
                                                 </form>
@@ -209,16 +214,13 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-
-        // Intercept form submit agar tidak reload halaman (Smooth Click via AJAX)
         document.querySelectorAll('.form-tandai-hadir').forEach(form => {
             form.addEventListener('submit', function (e) {
-                e.preventDefault(); // Mencegah reload halaman penuh
+                e.preventDefault();
 
                 const container = this.closest('span[id^="status-container-"]');
                 const button = this.querySelector('button');
 
-                // Mencegah klik ganda
                 button.disabled = true;
                 button.innerText = '...';
 
@@ -248,21 +250,14 @@
             });
         });
 
-        // Event listener WebSockets (Tetap aktif untuk sinkronisasi antar layar/device)
         if (typeof window.Echo !== 'undefined') {
-            
-            // 1. Refresh otomatis jika Admin menambah/mengubah Jadwal Sidang
             window.Echo.channel('jadwal-sidang-channel')
                 .listen('.jadwal.updated', function (e) {
-                    console.log('Ada pembaruan jadwal sidang, merefresh halaman kehadiran...');
                     window.location.reload();
                 });
 
-            // 2. Real-time update jika ada user/device lain yang klik tombol Hadir
             window.Echo.channel('kehadiran-channel')
                 .listen('.kehadiran.updated', function (e) {
-                    console.log('Update kehadiran diterima:', e);
-
                     const container = document.getElementById('status-container-' + e.kehadiran.id);
                     if (container) {
                         container.innerHTML = '<span class="badge-status badge-status-hadir">&#9679; Hadir</span>';
