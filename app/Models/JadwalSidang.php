@@ -45,8 +45,6 @@ class JadwalSidang extends Model
         return $this->belongsTo(Hakim::class, 'hakim_anggota2_id');
     }
 
-    // Nama relasi 'panitera' (bukan 'paniteraPengganti') supaya cocok dengan
-    // eager-load ->with(['panitera', ...]) yang sudah dipakai JadwalSidangController (guest).
     public function panitera(): BelongsTo
     {
         return $this->belongsTo(PaniteraPengganti::class, 'panitera_pengganti_id');
@@ -57,9 +55,6 @@ class JadwalSidang extends Model
         return $this->hasMany(Kehadiran::class, 'jadwal_sidang_id');
     }
 
-    // Scope query: eager-load semua relasi yang dibutuhkan untuk menampilkan
-    // detail jadwal sidang (dipakai bersama oleh Guest & Admin controller,
-    // supaya query-nya konsisten tanpa perlu menggabung controller-nya).
     public function scopeWithFullDetail($query)
     {
         return $query->with([
@@ -72,13 +67,11 @@ class JadwalSidang extends Model
         ]);
     }
 
-    // Scope query: filter berdasarkan tanggal sidang tertentu
     public function scopeForTanggal($query, $tanggal)
     {
         return $query->whereDate('tanggal_sidang', $tanggal);
     }
 
-    // Batas waktu toleransi check-in: jam sidang + 15 menit
     public function batasWaktuHadir(): \Carbon\Carbon
     {
         return \Carbon\Carbon::parse($this->tanggal_sidang->format('Y-m-d') . ' ' . $this->jam_sidang)
@@ -90,9 +83,6 @@ class JadwalSidang extends Model
         return now()->greaterThan($this->batasWaktuHadir());
     }
 
-    // Ringkasan status kehadiran keseluruhan untuk jadwal ini (dipakai di Dashboard).
-    // Menggabungkan status semua pihak (Penggugat + Tergugat, bisa lebih dari satu masing-masing)
-    // jadi satu label ringkas: 'Semua Hadir', 'Ada Kendala Kehadiran', atau 'Belum Lengkap'.
     public function statusRingkasan(): array
     {
         $statuses = $this->kehadiran->map(fn ($k) => $k->statusTampilan());

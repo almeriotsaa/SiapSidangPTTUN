@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 
 class HakimController extends Controller
 {
-    // Satu halaman menampilkan dua daftar: Majelis Hakim & Panitera Pengganti
     public function index()
     {
         $hakimList    = Hakim::orderBy('nama')->get();
@@ -18,7 +17,6 @@ class HakimController extends Controller
         return view('hakim.hakim', compact('hakimList', 'paniteraList'));
     }
 
-    // Simpan satu atau lebih nama hakim sekaligus
     public function store(Request $request)
     {
         $validated = $request->validate([

@@ -11,7 +11,6 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
-        // Ambil tanggal dari URL (?tanggal=2026-08-15), default hari ini kalau tidak ada / tidak valid
         $tanggalInput = $request->query('tanggal');
         try {
             $tanggal = $tanggalInput ? Carbon::parse($tanggalInput)->startOfDay() : today();
@@ -23,8 +22,6 @@ class DashboardController extends Controller
             ->forTanggal($tanggal)
             ->orderBy('jam_sidang')
             ->get()
-            // Jaga-jaga kalau ada jadwal_sidang yang perkara_id-nya sudah tidak
-            // valid (data tidak konsisten) — jangan sampai bikin dashboard crash.
             ->filter(fn ($j) => $j->perkara !== null)
             ->values();
 

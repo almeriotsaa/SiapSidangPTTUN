@@ -14,16 +14,11 @@ class Perkara extends Model
         'agenda',
     ];
 
-    // Relasi utama — dipakai di semua halaman admin (Dashboard, Kelola Jadwal,
-    // Kehadiran, Perkara).
     public function pihak(): HasMany
     {
         return $this->hasMany(PihakPerkara::class, 'perkara_id');
     }
 
-    // Alias — dipakai oleh view guest.jadwal (dibuat sebelum model ini ada).
-    // JANGAN hapus salah satu dari dua method ini; keduanya harus tetap ada
-    // supaya kedua sisi (admin & guest) sama-sama jalan.
     public function pihakPerkara(): HasMany
     {
         return $this->pihak();

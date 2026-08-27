@@ -25,8 +25,6 @@ class Kehadiran extends Model
         return $this->belongsTo(JadwalSidang::class, 'jadwal_sidang_id');
     }
 
-    // Nama relasi 'pihak' (bukan 'pihakPerkara') supaya cocok dengan
-    // eager-load ->with(['kehadiran.pihak']) yang sudah dipakai JadwalSidangController (guest).
     public function pihak(): BelongsTo
     {
         return $this->belongsTo(PihakPerkara::class, 'pihak_perkara_id');

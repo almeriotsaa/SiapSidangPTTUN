@@ -9,11 +9,6 @@ use Illuminate\Http\Request;
 
 class KehadiranController extends Controller
 {
-    // Pastikan JANGAN ada kode seperti ini:
-    // public function __construct() {
-    //     $this->middleware('auth'); 
-    // }
-
     public function index()
     {
         $jadwalList = JadwalSidang::with(['perkara', 'kehadiran.pihak'])

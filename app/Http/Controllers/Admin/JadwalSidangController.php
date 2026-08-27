@@ -18,7 +18,6 @@ class JadwalSidangController extends Controller
     {
         $jadwalList = JadwalSidang::withFullDetail()->orderByDesc('tanggal_sidang')->orderBy('jam_sidang')->get();
 
-        // Data untuk dropdown form Tambah/Edit — semua diambil dari database asli
         $perkaraList  = Perkara::with('pihak')->orderBy('nomor_perkara')->get();
         $hakimList    = Hakim::orderBy('nama')->get();
         $paniteraList = PaniteraPengganti::orderBy('nama')->get();
@@ -32,11 +31,9 @@ class JadwalSidangController extends Controller
 
         DB::transaction(function () use ($validated) {
             $jadwal = JadwalSidang::create($validated);
-
             $this->buatKehadiranUntukPerkara($jadwal);
         });
 
-        // <-- 2. TRIGGER REAL-TIME EVENT SAAT TAMBAH JADWAL
         broadcast(new JadwalSidangUpdated())->toOthers();
 
         return redirect()->route('kelola-jadwal.index')->with('success', 'Jadwal sidang berhasil ditambahkan.');
@@ -51,15 +48,12 @@ class JadwalSidangController extends Controller
 
             $jadwal->update($validated);
 
-            // Kalau perkara-nya diganti, kehadiran lama (untuk pihak dari perkara sebelumnya)
-            // sudah tidak relevan — hapus dan buat ulang sesuai pihak dari perkara yang baru.
             if ($perkaraBerubah) {
                 $jadwal->kehadiran()->delete();
                 $this->buatKehadiranUntukPerkara($jadwal);
             }
         });
 
-        // <-- 3. TRIGGER REAL-TIME EVENT SAAT UPDATE JADWAL
         broadcast(new JadwalSidangUpdated())->toOthers();
 
         return redirect()->route('kelola-jadwal.index')->with('success', 'Jadwal sidang berhasil diperbarui.');
@@ -67,10 +61,8 @@ class JadwalSidangController extends Controller
 
     public function destroy(JadwalSidang $jadwal)
     {
-        // kehadiran terkait otomatis ikut terhapus (cascadeOnDelete di skema database)
         $jadwal->delete();
 
-        // <-- 4. TRIGGER REAL-TIME EVENT SAAT HAPUS JADWAL
         broadcast(new JadwalSidangUpdated())->toOthers();
 
         return redirect()->route('kelola-jadwal.index')->with('success', 'Jadwal sidang berhasil dihapus.');

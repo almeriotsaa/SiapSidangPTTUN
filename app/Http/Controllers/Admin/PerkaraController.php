@@ -71,10 +71,6 @@ class PerkaraController extends Controller
                 'agenda'        => $validated['agenda'],
             ]);
 
-            // Catatan: pihak lama dihapus & diganti daftar baru. Karena kehadiran
-            // terhubung ke pihak_perkara dengan cascadeOnDelete, mengedit daftar
-            // Penggugat/Tergugat pada perkara yang SUDAH punya riwayat kehadiran
-            // akan ikut menghapus riwayat kehadiran terkait pihak yang dihapus.
             $perkara->pihakPerkara()->delete();
 
             foreach ($validated['penggugat'] as $nama) {
@@ -99,8 +95,6 @@ class PerkaraController extends Controller
 
     public function destroy(Perkara $perkara)
     {
-        // Peringatan: menghapus perkara akan ikut menghapus semua jadwal sidang
-        // dan riwayat kehadiran terkait (cascadeOnDelete pada skema database).
         $perkara->delete();
 
         return redirect()->route('perkara.index')->with('success', 'Data perkara berhasil dihapus.');

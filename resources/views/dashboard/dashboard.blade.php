@@ -144,7 +144,7 @@
     }
 </style>
 
-<div class="container-fluid px-4 pt-4" style="max-width:1500px;">
+<div class="container-fluid px-4 pt-4 pb-5" style="max-width:1500px;">
 
     {{-- Role badge --}}
     <div class="mb-4">

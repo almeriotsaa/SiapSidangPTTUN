@@ -10,9 +10,7 @@ use App\Http\Controllers\Admin\JadwalSidangController as AdminJadwalSidangContro
 use App\Http\Controllers\Admin\KehadiranController; // Controller Kehadiran
 use App\Http\Controllers\Admin\DashboardController;
 
-// ============================
-// Halaman Publik (Guest, Front Office, & Admin)
-// ============================
+
 Route::get('/', function () { return view('guest.home'); });
 Route::get('/jadwal', [JadwalSidangController::class, 'index']);
 Route::get('/kontak', function () { return view('guest.kontak'); });
@@ -23,17 +21,10 @@ Route::get('/kehadiran', [KehadiranController::class, 'index'])->name('kehadiran
 Route::post('/kehadiran/{kehadiran}/hadir', [KehadiranController::class, 'tandaiHadir'])->name('kehadiran.tandai-hadir');
 
 
-// ============================
-// Autentikasi
-// ============================
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.attempt');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-
-// ============================
-// Halaman Internal (Wajib Login FO & Admin)
-// ============================
 Route::middleware('auth')->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');

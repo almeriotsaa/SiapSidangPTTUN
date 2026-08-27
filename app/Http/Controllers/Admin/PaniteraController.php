@@ -8,9 +8,6 @@ use Illuminate\Http\Request;
 
 class PaniteraController extends Controller
 {
-    // Tidak ada halaman index sendiri — Panitera Pengganti ditampilkan
-    // bersama Majelis Hakim di satu halaman yang sama (lihat HakimController@index)
-
     public function store(Request $request)
     {
         $validated = $request->validate([
